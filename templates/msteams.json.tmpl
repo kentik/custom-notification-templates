@@ -1,0 +1,68 @@
+{{- /*
+See docs for Microsoft Teams:
+https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using?tabs=cURL
+https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference
+*/ -}}
+
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "@type": "MessageCard",
+    "@context": "http://schema.org/extensions",
+    "themeColor": "0076D7",
+    "summary": "{{- $.Headline }} - {{ $.Summary -}}",
+    "sections": [
+      {
+        "activityTitle": "{{- $.Summary -}}",
+        "activitySubtitle": "{{- $.Headline }} for {{ $.CompanyName }} sent on {{ $.NowDatetime }}",
+        "facts": [
+          {
+            "name": "State",
+            "value": "{{.PreviousState}} → {{.CurrentState}}"
+          },
+          {
+            "name": "Timeframe",
+            "value": "{{.StartTime}} (start) → {{.EndTime}}"
+          },
+          {{- range $index, $detail := .Details.General -}}
+            {
+              "name": "{{$detail.LabelOrName}}",
+              "value": "{{$detail.Value}}"
+            },
+          {{- end -}}
+          {{- range $index, $detail := .Details.WithTag "dimension" -}}
+            {
+              "name": "{{$detail.LabelOrName}}",
+              "value": "{{$detail.Value}}"
+            },
+          {{- end -}}
+          {{- range $index, $detail := .Details.WithTag "metrics" -}}
+            {
+              "name": "Metric: {{$detail.LabelOrName}}",
+              "value": "{{$detail.Value}}"
+            },
+          {{- end -}}
+          {{- /* last one here is just to keep commas under control */ -}}
+          {
+              "name": "Sent on",
+              "value": "{{$.NowDatetime}}"
+          }
+        ]
+      }
+    ],
+    "potentialAction": [
+      {{- range $index, $url := .Details.WithTag "url" -}}
+      {{- join $index -}}
+      {
+        "@type": "OpenUri",
+        "name": "{{- $url.LabelOrName -}}",
+        "targets": [{
+          "os": "default",
+          "uri": "{{- $url.Value -}}"
+        }]
+      }
+      {{- end -}}
+    ]
+  {{- end -}}
+{{- end -}}
+}

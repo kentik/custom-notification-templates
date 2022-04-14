@@ -1,0 +1,47 @@
+{{- /*
+Pagerduty docs:
+https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTgx-sending-an-alert-event
+*/ -}}
+
+{
+  "routing_key": "change_me_cafebabe_blablabla"
+  {{- if .IsSingleEvent -}}
+    ,
+    {{- with .Event -}}
+      {{- if .IsAlarm }}
+        "dedup_key": "{{$.CompanyID}}.{{.Details.GetValue "AlarmPolicyID"}}.{{.Details.GetValue "AlarmID"}}.{{.Details.GetValue "AlarmThresholdID"}}",
+      {{- else if .IsSynthetic }}
+        "dedup_key": "{{$.CompanyID}}.{{.Details.GetValue "TestID"}}.{{.Details.GetValue "AlarmPolicyID"}}.{{.Details.GetValue "AlarmID"}}",
+      {{- else if .IsMitigation }}
+        "dedup_key": "{{$.CompanyID}}.{{.Details.GetValue "MitigationPolicyID"}}.{{.Details.GetValue "MitigationID"}}.{{.Details.GetValue "MitigationMethodID"}}",
+      {{- else if .IsInsight }}
+        "dedup_key": "{{$.CompanyID}}.{{.Details.GetValue "InsightID"}}",
+      {{- end -}}
+      "event_action": {{- if .IsActive -}}"trigger"{{- else -}}"resolve"{{- end -}},
+      "payload": {
+        "summary": "{{.Description}}",
+        "severity": "info",
+        "source": "{{$.Headline}} for {{$.CompanyName}}",
+        "timestamp": "{{$.NowRFC3339}}",
+        "custom_details": {
+          {{- .Details.General.ToMap | toJSON | explodeJSONKeys -}}
+          {{- if .Details.HasTag "metric" -}}
+            ,{{- (.Details.WithTag "metric").ToMap | toJSON | explodeJSONKeys -}}
+          {{- end -}}
+          {{- if .Details.HasTag "dimension" -}}
+            ,{{- (.Details.WithTag "dimension").ToMap  | toJSON | explodeJSONKeys -}}
+          {{- end -}}
+        },
+        "links": [
+          {{- range $index, $url := .Details.WithTag "url" -}}
+          {{- join $index -}}
+          {
+            "text": "{{- $url.LabelOrName -}}",
+            "href": "{{- $url.Value -}}"
+          }
+          {{- end -}}
+        ]
+      }
+    {{- end -}}
+  {{- end -}}
+}

@@ -1,0 +1,84 @@
+{{- /*
+Slack docs:
+https://api.slack.com/messaging/webhooks
+https://api.slack.com/block-kit
+*/ -}}
+
+
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "blocks": [
+      {
+        "type": "divider"
+      },
+      {
+        "type": "header",
+        "text": {
+          "type": "plain_text",
+          "emoji": true,
+          "text": "
+            {{- $.Summary -}}
+          "
+        }
+      },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": "{{ $.Headline }} for *{{ $.CompanyName }}* sent on {{ $.NowDatetime }}"
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "
+            {{- if not .IsInsight -}}
+              *State:* {{ .PreviousState }} → *{{ .CurrentState }}*\n*Timeframe:* {{ .StartTime }} (start) → *{{ .EndTime }}*\n
+            {{- end -}}
+            {{- range $index, $detail := .Details.General -}}
+              *{{ $detail.LabelOrName }}*: {{ $detail.Value }}\n
+            {{- end -}}
+            {{- with $dimensions := .Details.WithTag "dimension" -}}
+              {{- if gt (len $dimensions) 0 -}}
+                *Dimensions*:\n
+                {{- range $index, $detail := $dimensions -}}
+                  - *{{ $detail.LabelOrName }}*: {{ $detail.Value }}\n
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+            {{- with $dimensions := .Details.WithTag "metric" -}}
+              {{- if gt (len $dimensions) 0 -}}
+                *Metrics*:\n
+                {{- range $index, $detail := $dimensions -}}
+                  - {{ $detail.Value }} {{ $detail.LabelOrName }}\n
+                {{- end -}}
+              {{- end -}}
+            {{- end -}}
+          "
+        }
+      },
+      {
+        "type": "actions",
+        "elements": [
+          {{- range $index, $url := .Details.WithTag "url" -}}
+          {{- join $index -}}
+          {
+            "type": "button",
+            "action_id": "{{- $url.Name -}}",
+            "text": {
+              "type": "plain_text",
+              "text": "{{- $url.LabelOrName -}}"
+            },
+            "url": "{{ $url.Value }}"
+          }
+          {{- end -}}
+        ]
+      }
+    ]
+  {{- end -}}
+{{- end -}}
+}

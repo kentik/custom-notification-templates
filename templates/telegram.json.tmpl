@@ -1,0 +1,27 @@
+{{- /*
+How to create your Telegram bot: https://core.telegram.org/bots#3-how-do-i-create-a-bot
+Formatting options: https://core.telegram.org/bots/api#formatting-options
+*/ -}}
+
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "chat_id": 123456789,
+    "parse_mode": "HTML",
+    "text": "
+    {{- /**/ -}}
+    <strong>{{- $.Headline }}: {{ $.Summary -}}</strong>\n
+    {{- /**/ -}}
+    <strong>State:</strong> {{ .PreviousState }} → <strong>{{ .CurrentState }}</strong>\n
+    {{- /**/ -}}
+    <strong>Timeframe:</strong> {{ .StartTime }} (start) → <strong>{{ .EndTime }}</strong>\n
+    {{- range $index, $detail := .Details.General -}}
+      <strong>{{ $detail.LabelOrName }}</strong>: {{ $detail.Value }}\n
+    {{- end -}}
+    {{- range $index, $url := .Details.WithTag "url" -}}
+      <a href=\"{{ $url.Value }}\">{{- $url.LabelOrName -}}</a>\n
+    {{- end -}}
+    "
+  {{- end -}}
+{{- end -}}
+}

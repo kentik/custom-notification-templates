@@ -1,0 +1,25 @@
+{
+  {{- . | j | x -}},
+  {{- if .IsSingleEvent  -}}
+    {{- with .Event -}}
+      {{- . | j | x -}},
+      {{- .Details.General.ToMap | j | x -}},
+      "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
+      "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
+      "Links": {{- (.Details.WithTag "url").ToMap | j -}}
+    {{- end -}}
+  {{- else -}}
+  "Events": [
+    {{- range $index, $event := .Events -}}
+      {{- join $index -}}
+      {
+        {{- . | j | x -}},
+        {{- .Details.General.ToMap | j | x -}},
+        "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
+        "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
+        "Links": {{- (.Details.WithTag "url").ToMap | j -}}
+      }
+    {{- end -}}
+  ]
+  {{- end -}}
+}

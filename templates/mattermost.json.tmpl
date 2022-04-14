@@ -1,0 +1,39 @@
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "username": "Kentik",
+    "icon_url": "https://www.kentik.com/favicons/favicon-32x32.png",
+    "attachments": [
+      {
+        {{- if .IsActive -}}
+        "color":"#FF0000",
+        {{- else -}}
+        "color":"#008000",
+        {{- end -}}
+        "author_name": "Kentik",
+        "author_icon": "https://www.kentik.com/favicons/favicon-32x32.png",
+        "text": "## {{ $.Headline }}: {{ $.Summary -}}\n
+          {{- range $index, $url := .Details.WithTag "url" -}}
+            {{- joinWith $index " | " -}}
+            [{{- $url.LabelOrName -}}]({{ $url.Value }})\n
+          {{- end -}}
+          {{- if not .IsInsight -}}
+            **State:** {{ .PreviousState }} → **{{ .CurrentState }}**\n**Timeframe:** {{ .StartTime }} (start) → **{{ .EndTime }}**\n
+          {{- end -}}
+          {{- range $index, $detail := .Details.General -}}
+            **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+          {{- end -}}
+          {{- with $dimensions := .Details.WithTag "dimension" -}}
+            {{- if gt (len $dimensions) 0 -}}
+              **Dimensions**:\n
+              {{- range $index, $detail := $dimensions -}}
+                - **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+        "
+      }
+    ]
+  {{- end -}}
+{{- end -}}
+}
