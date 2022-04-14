@@ -2,7 +2,7 @@ IMPORTANT NOTE
 ==============
 
 Please note this directory serves solely the purpose of basic testing of your
-custom webhook templates for Kentik Portal notifications. The codebase here
-somehow reflects the way how Kentik creates the notifications but it is not
-any kind of contract and it is a subject to change.
+custom webhook templates for Kentik Portal notifications. Although the codebase here
+may reflect how Kentik creates the notifications, it is not in any way
+a contract and is subject to change.
 
