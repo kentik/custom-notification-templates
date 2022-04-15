@@ -2,18 +2,18 @@
 
 ## Introduction
 
-**You can define templates for custom webhooks using [Go Template Syntax](https://pkg.go.dev/text/template). We highly recommend that you familiarize yourself with the [official docs](https://pkg.go.dev/text/template) or this [Hashicorp article](https://learn.hashicorp.com/tutorials/nomad/go-template-syntax). Nowadays, a vast majority of system integrations use JSON as the de-facto standard, therefore examples here focus on this format. Still, Go templating is flexible enough to use any output formats (e.g. XML or syslog).**
+**You can define templates for custom webhooks using [Go Template Syntax](https://pkg.go.dev/text/template). We highly recommend that you familiarize yourself with the [official docs](https://pkg.go.dev/text/template) or this [Hashicorp article](https://learn.hashicorp.com/tutorials/nomad/go-template-syntax). Nowadays, a vast majority of system integrations use JSON as the de-facto standard, therefore examples here focus on this format. Still, Go templating is flexible enough to use other output formats (e.g. XML or syslog).**
 
 ## Helper Functions
 
-Before digging into notification data structure, it's worth getting to know the helper functions that are added on top of Go templates.
+Before digging into the notification data structure, it's worth getting to know the helper functions that are added on top of Go templates.
 
 ### String Functions
 
 String functions transform string values for the notification context.
 
 - `toUpper` - Converts all string letters to uppercase.
-- `title` - Converts all letters at the beginnings of words to uppercase.
+- `title` - Converts all letters at the beginning of words to uppercase.
 - `trimSpace` - Drops spaces from the beginning and ending of the string.
 
 ### JSON Functions
