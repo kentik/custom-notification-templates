@@ -1,3 +1,9 @@
+{{- /*
+Incoming Webhooks for Mattermost: https://docs.mattermost.com/developer/webhooks-incoming.html
+It is very convenient to test the incoming webhook payload with mattermost official Docker image: https://hub.docker.com/r/mattermost/platform
+Formatting options are as regular Markdown
+*/ -}}
+
 {
 {{- if .IsSingleEvent -}}
   {{- with .Event -}}
@@ -12,17 +18,28 @@
         {{- end -}}
         "author_name": "Kentik",
         "author_icon": "https://www.kentik.com/favicons/favicon-32x32.png",
-        "text": "## {{ $.Headline }}: {{ $.Summary -}}\n
-          {{- range $index, $url := .Details.WithTag "url" -}}
-            {{- joinWith $index " | " -}}
-            [{{- $url.LabelOrName -}}]({{ $url.Value }})\n
+        "text": "
+          {{- /**/ -}}
+          ## {{ $.Headline }}: {{ $.Summary -}}\n
+
+          {{- with $urls := .Details.WithTag "url" -}}
+            {{- if gt (len $urls) 0 -}}
+              {{- range $index, $url := $urls -}}
+                {{- joinWith $index " | " -}}
+                [{{- $url.LabelOrName -}}]({{ $url.Value }})
+              {{- end -}}
+              \n
+            {{- end -}}
           {{- end -}}
+
           {{- if not .IsInsight -}}
             **State:** {{ .PreviousState }} → **{{ .CurrentState }}**\n**Timeframe:** {{ .StartTime }} (start) → **{{ .EndTime }}**\n
           {{- end -}}
+
           {{- range $index, $detail := .Details.General -}}
             **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
           {{- end -}}
+
           {{- with $dimensions := .Details.WithTag "dimension" -}}
             {{- if gt (len $dimensions) 0 -}}
               **Dimensions**:\n
