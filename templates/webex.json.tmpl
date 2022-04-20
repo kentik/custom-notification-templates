@@ -1,0 +1,43 @@
+{{- /*
+Incoming Webhook app for Cisco Webex Teams:
+https://apphub.webex.com/applications/incoming-webhooks-cisco-systems-38054-23307
+Formatting options are as regular Markdown
+*/ -}}
+
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "markdown": "
+    {{- /**/ -}}
+    ## {{ $.Headline }}: {{ $.Summary -}}\n
+
+    {{- with $urls := .Details.WithTag "url" -}}
+      {{- if gt (len $urls) 0 -}}
+        {{- range $index, $url := $urls -}}
+          {{- joinWith $index " | " -}}
+          [{{- $url.LabelOrName -}}]({{ $url.Value }})
+        {{- end -}}
+        \n
+      {{- end -}}
+    {{- end -}}
+
+    {{- if not .IsInsight -}}
+      **State:** {{ .PreviousState }} → **{{ .CurrentState }}**\n**Timeframe:** {{ .StartTime }} (start) → **{{ .EndTime }}**\n
+    {{- end -}}
+
+    {{- range $index, $detail := .Details.General -}}
+      **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+    {{- end -}}
+
+    {{- with $dimensions := .Details.WithTag "dimension" -}}
+      {{- if gt (len $dimensions) 0 -}}
+        **Dimensions**:\n
+        {{- range $index, $detail := $dimensions -}}
+          - **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    "
+  {{- end -}}
+{{- end -}}
+}
