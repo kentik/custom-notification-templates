@@ -6,6 +6,8 @@
       {{- .Details.General.ToMap | j | x -}},
       "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
       "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
+      "Devices": {{- (.Details.WithTag "device").ToMap | j -}},
+      "DeviceLabels": {{- (.Details.WithTag "device_labels").ToMap | j -}},
       "Links": {{- (.Details.WithTag "url").ToMap | j -}}
     {{- end -}}
   {{- else -}}
@@ -17,6 +19,8 @@
         {{- .Details.General.ToMap | j | x -}},
         "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
         "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
+        "Devices": {{- (.Details.WithTag "device_labels").ToMap | j -}},
+        "DeviceLabels": {{- (.Details.WithTag "device_labels").ToMap | j -}},
         "Links": {{- (.Details.WithTag "url").ToMap | j -}}
       }
     {{- end -}}
