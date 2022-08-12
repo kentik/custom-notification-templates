@@ -282,6 +282,18 @@ var TestAlarm = &NotificationViewModel{
 					Tag:   "dimension",
 				},
 				&EventViewModelDetail{
+					Name:  "i_device_id",
+					Label: "Device ID",
+					Value: 1234,
+					Tag: "device",
+				},
+				&EventViewModelDetail{
+					Name:  "i_device_labels",
+					Label: "Device Labels",
+					Value: "ACME1, ACME2",
+					Tag: "device_labels",
+				},
+				&EventViewModelDetail{
 					Name:  "DashboardAlarmURL",
 					Label: "Open in Dashboard",
 					Value: "https://portal.kentik.com/v4/library/dashboards/49",
