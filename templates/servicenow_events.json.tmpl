@@ -1,0 +1,95 @@
+{{- /*
+Servicenow docs on events table:
+https://docs.servicenow.com/en-US/bundle/tokyo-it-operations-management/page/product/event-management/task/send-events-via-web-service.html
+
+From the docs above:
+> The URL in the format: http://<instancename>.service-now.com/em_event.do?JSONv2&sysparm_action=insertMultiple
+> is also supported in case you do want to activate Business rules. However, the performance of the first URL is superior.
+*/ -}}
+
+{
+  "records": [
+    {{- with .Event -}}
+    {
+      "source": "Kentik",
+      "ci_identifier": "Kentik CI Identified",
+      "sys_created_by": "Kentik created",
+      "node": "{{ if .Details.Has "DeviceName" }}{{ .Details.GetValue "DeviceName" }}{{ else }}unspecified{{ end }}",
+      "type": "{{- .Type -}}",
+      "description": "
+        {{- /**/ -}}
+        {{ $.Headline }}: {{ $.Summary -}}\n
+
+        {{- with $urls := .Details.WithTag "url" -}}
+          {{- if gt (len $urls) 0 -}}
+            {{- range $index, $url := $urls -}}
+              {{- joinWith $index "\\n" -}}
+              {{- $url.LabelOrName -}}: {{ $url.Value -}}
+            {{- end -}}
+            \n\n
+          {{- end -}}
+        {{- end -}}
+
+        {{- if not .IsInsight -}}
+          State: {{ .PreviousState }} → {{ .CurrentState }}\n{{- /**/ -}}
+          Timeframe: {{ .StartTime }} (start) → {{ .EndTime }}\n
+        {{- end -}}
+        \n
+
+        {{- range $index, $detail := .Details.General -}}
+          {{ $detail.LabelOrName }}: {{ $detail.Value }}\n
+        {{- end -}}
+
+        {{- with $dimensions := .Details.WithTag "dimension" -}}
+          {{- if gt (len $dimensions) 0 -}}
+            Dimensions:\n
+            {{- range $index, $detail := $dimensions -}}
+              - {{ $detail.LabelOrName }}: {{ $detail.Value }}\n
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      ",
+      "resolution_state": "{{- if .IsActive -}}New{{- else -}}Closing{{- end -}}",
+      "metric_name": "
+        {{- range $index, $detail := .Details.WithTag "metric" -}}
+          {{- joinWith $index ", " -}}
+          {{- $detail.LabelOrName -}}
+        {{- end -}}
+      ",
+      "resource": "
+        {{- if .Details.Has "AlarmPolicyName" -}}
+          {{- .Details.GetValue "AlarmPolicyName" -}}
+        {{- else if .Details.Has "MitigationPolicyName" -}}
+          {{- .Details.GetValue "MitigationPolicyName" -}}
+        {{- else -}}
+          {{- .GroupName -}}
+        {{- end -}}
+      ",
+      "severity":
+        {{- if .IsAlarm -}}
+          {{- if .IsActive -}}
+            {{- with $severity := .Details.GetValue "AlarmSeverity" -}}
+              {{- if eq $severity "minor" -}}
+                4
+              {{- else if eq $severity "minor2" -}}
+                4
+              {{- else if eq $severity "major" -}}
+                3
+              {{- else if eq $severity "major2" -}}
+                2
+              {{- else if eq $severity "critical" -}}
+                1
+              {{- else -}}
+                5
+              {{- end -}}
+            {{- end -}}
+          {{- else -}}
+            0
+          {{- end -}}
+        {{- else -}}
+          3
+        {{- end }}
+    }
+    {{- end }}
+  ]
+}
