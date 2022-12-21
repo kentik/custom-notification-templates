@@ -36,7 +36,7 @@ https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-refere
               "value": "{{$detail.Value}}"
             },
           {{- end -}}
-          {{- range $index, $detail := .Details.WithTag "metrics" -}}
+          {{- range $index, $detail := .Details.WithTag "metric" -}}
             {
               "name": "Metric: {{$detail.LabelOrName}}",
               "value": "{{$detail.Value}}"

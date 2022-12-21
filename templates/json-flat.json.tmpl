@@ -1,0 +1,11 @@
+{
+  "Events": [
+    {{- range $index, $event := .Events -}}
+      {{- join $index -}}
+      {
+        {{- . | j | x -}},
+        {{- .Details.ToMap | j | x -}}
+      }
+    {{- end -}}
+  ]
+}

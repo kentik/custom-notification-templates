@@ -1,0 +1,90 @@
+{{- /*
+Moogsoft 7.x: https://docs.moogsoft.com/AIOps.7.3.0/webhook.html
+*/ -}}
+
+{
+  {{- if and .IsSingleEvent -}}
+    {{- with .Event -}}
+      {{- if .IsAlarm -}}
+        "signature":"{{.Details.GetValue "AlarmPolicyID"}}:{{.Details.GetValue "i_device_id"}}:{{.Details.GetValue "AlarmID"}}",
+        {{- if .Details.Has "i_device_id" -}}
+          "source_id":"{{(.Details.Get "i_device_id").Value}}",
+          "source":"{{(.Details.Get "i_device_id").LabelOrName}}",
+        {{- else -}}
+          "source_id":"unknown",
+          "source":"unknown",
+        {{- end -}}
+        "external_id":"{{.Details.GetValue "AlarmID"}}",
+        "manager":"{{$.Headline}}",
+        "class":"{{.Details.GetValue "AlarmPolicyName"}}",
+        "agent_location":"Kentik",
+        "type":"{{.Type}}",
+        "severity":
+        {{- if .IsActive -}}
+          {{- with $severity := .Details.GetValue "AlarmSeverity" -}}
+            {{- if eq $severity "minor" -}}
+              1
+            {{- else if eq $severity "minor2" }}
+              2
+            {{- else if eq $severity "major" }}
+              3
+            {{- else if eq $severity "major2" }}
+              4
+            {{- else if eq $severity "critical" }}
+              5
+            {{- else }}
+              0
+            {{- end -}}
+          {{- end -}}
+        {{- else -}}
+          0
+        {{- end -}},
+        "agent_time":"{{$.NowUnix}}",
+        "description":"
+        {{- /**/ -}}
+        {{- $.Summary -}}
+        {{- "\\n" -}}
+
+        {{- with $devices := .Details.WithTag "device" -}}
+          {{- if gt (len $devices) 0 -}}
+            Device{{- ": " -}}
+            {{- range $index, $detail := $devices -}}
+              {{- $detail.LabelOrName }} / {{ $detail.Value }}
+            {{- end -}}
+            {{- "\\n" -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- with $metrics := .Details.WithTag "metric" -}}
+          {{- if gt (len $metrics) 0 -}}
+            Metrics{{- ": " -}}
+            {{- range $index, $detail := $metrics -}}
+              {{- joinWith $index ", " -}}
+              {{ $detail.Value }} {{ $detail.LabelOrName -}}
+            {{- end -}}
+            {{- "\\n" -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- with $dimensions := .Details.WithTag "dimension" -}}
+          {{- if gt (len $dimensions) 0 -}}
+            Dimensions{{- ": " -}}
+            {{- range $index, $detail := $dimensions -}}
+              {{- joinWith $index ", " -}}
+              {{- $detail.LabelOrName }} {{ $detail.Value -}}
+            {{- end -}}
+            {{- "\\n" -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- with $urls := .Details.WithTag "url" -}}
+          {{- range $index, $url := $urls -}}
+            {{- joinWith $index "\\n" -}}
+            {{- $url.LabelOrName -}}{{- ": " -}}{{- $url.Value -}}
+          {{- end -}}
+        {{- end -}}
+        "
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+}
