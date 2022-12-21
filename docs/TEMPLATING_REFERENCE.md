@@ -269,20 +269,20 @@ This will result in the following JSON payload on render:
 }
 ```
 
-#### Working with Details Collection Items
+### Working with Details Collection Items
 
-##### Details collection transformation
+#### Details collection transformation
 
 - `Details.ToMap` - Converts an array into the map (object), with names becoming the property keys.
-- `Details.Names` - Provides an array of detail names.
+- `Details.Names` - Provides an array of detail names (the ones that are present from the given list).
 - `Details.Values` - Provides an array of detail values.
 
-##### Details collection checks
+#### Details collection checks
 
 - `Details.Has name` - Checks if the details include the item with a given name.
 - `Details.HasTag tag` - Checks if the details include any item of a given tag.
 
-##### Details collection getters
+#### Details collection getters
 
 - `Details.Get name` - Picks a single detail of a given name or a nullish one if it is not found.
 - `Details.GetValue name` - Picks just a value of the detail or `nil` (JSON's `null`) if there aren't any.
@@ -290,6 +290,272 @@ This will result in the following JSON payload on render:
 A single detail can also have one helper method:
 
 - `Detail.LabelOrName` - Use `Label`, if present, or `Name` otherwise.
+
+### Details Collection Reference
+
+#### General
+
+General details are the ones without tag specified. Particular names of general details depend on the source type, therefore it is recommended to use `{{- .Details.General.ToMap | j -}}` instead of referring the particular details name. However, the latter is also possible and supported.
+
+The list of general detail names:
+
+- Insights: `InsightName`,`InsightID`, `InsightDataSourceType`, `InsightPlainDescription`
+- Alarm state change: `AlarmID`, `AlarmSeverity`, `AlarmPolicyName`, `AlarmPolicyID`, `AlarmThresholdID`, `AlarmBaselineSource`, `AlarmBaselineDescription`
+- Mitigation: `MitigationID`, `MitigationPolicyID`, `MitigationPolicyName`, `MitigationPlatformID`, `MitigationPlatformName`, `MitigationMethodID`, `MitigationMethodName`, `MitigationAlarmID`, `MitigationAlertIp`, `LastMitigationEvent`, `AlarmSeverity`
+- Synthetics: `TestName`, `TestType`, `Health`, `TestID`
+
+Example:
+
+```json
+[{
+  "Label": "ID",
+  "Name": "AlarmID",
+  "Value": "216148908",
+},
+{
+  "Label": "Severity",
+  "Name": "AlarmSeverity",
+  "Value": "major",
+},
+{
+  "Label": "Threshold ID",
+  "Name": "AlarmThresholdID",
+  "Value": "12716",
+},
+{
+  "Label": "Policy ID",
+  "Name": "AlarmPolicyID",
+  "Value": "4085",
+},
+{
+  "Label": "Source Policy Name",
+  "Name": "AlarmPolicyName",
+  "Value": "V4 DDoS - UDP Flood",
+}]
+```
+
+Value types of general tags depends on the name.
+
+#### Urls
+
+Tag: `url`
+
+In case of url details, `Value` property represents the full URL that can be used as hyperlink to access web view of the event that triggered given notification.
+
+Example:
+
+```json
+[{
+  "Name": "DashboardAlarmURL",
+  "Label": "Open in Dashboard",
+  "Value": "https://portal.kentik.com/v4/library/dashboards/49",
+  "Tag": "url"
+},
+{
+  "Name": "InsightAlarmURL",
+  "Label": "Open Insight",
+  "Value": "https://portal.kentik.com/v4/core/insights/a197790252",
+  "Tag": "url"
+},
+{
+  "Name": "AttackLogURL",
+  "Label": "Open Log",
+  "Value": "https://portal.kentik.com/v4/protect/ddos/analyze/log/197790252",
+  "Tag": "url"
+}]
+```
+
+#### Dimensions and metrics
+
+Tags: `dimension`, `metric`
+
+Typical for alerting-source notifications (alarms state change and mitigations). Provide information about alert dimensions and metrics. Values are pre-formatted for good visual presentation but still should be numeric where applicable. Note the convention for a metric: the `Name` and `Label` is used to pass the unit information.
+
+Example:
+
+```json
+[{
+  "Label": "Bits/second",
+  "Name": "bits",
+  "Tag": "metric",
+  "Value": 48878.94921875
+},
+{
+  "Label": "Packets/second",
+  "Name": "packets",
+  "Tag": "metric",
+  "Value": 240.266668319702148
+},
+{
+  "Label": "Unique Source IPs",
+  "Name": "unique_src_ip",
+  "Tag": "metric",
+  "Value": 1
+},
+{
+  "Label": "Dest IP/CIDR",
+  "Name": "IP_dst",
+  "Tag": "dimension",
+  "Value": "208.76.14.235"
+},
+{
+  "Label": "Device",
+  "Name": "i_device_id",
+  "Tag": "dimension",
+  "Value": "32650"
+},
+{
+  "Label": "Site",
+  "Name": "i_device_site_name",
+  "Tag": "dimension",
+  "Value": "Ashburn DC3"
+}]
+```
+
+#### Labels
+
+Tags: `label`, `device_label`
+
+Provide information about labels related with a given notification. Tag `device_label` is used for device-related labels, and basic `label` is used in general cases.
+
+Note that the structure of labels `Value` is an object, not a simple type (string or number) and it includes `Name` (actual label), `Color` in hex and `IsDark` - a boolean which hints whether the color is dark or not.
+
+The `Name` property of the detail is irrelevant, please use the `Value.Name` instead.
+
+Example:
+
+```json
+[{
+  "Name": "TestLabel1",
+  "Tag": "label",
+  "Value": {
+    "Color": "#ff0000",
+    "IsDark": true,
+    "Name": "ACME"
+  },
+},
+{
+  "Label": "TestLabel2",
+  "Tag": "label",
+  "Value": {
+    "Color": "#ffffff",
+    "IsDark": false,
+    "Name": "Foobar"
+  }
+}]
+```
+
+#### Device
+
+Tag: `device`
+
+Information about device that is associated with a given notification (e.g. provided when device is a dimension for alerting policy).
+
+In case of device details, the names are fully meaningful and the templates can rely on them (e.g. `DeviceName` for a name and `DeviceType` for a type).
+
+Example:
+
+```json
+[{
+  "Label": "Device ID",
+  "Name": "DeviceId",
+  "Tag": "device",
+  "Value": "32650"
+},
+{
+  "Label": "Device",
+  "Name": "DeviceName",
+  "Tag": "device",
+  "Value": "QFX_123456_tee"
+},
+{
+  "Label": "Device Type",
+  "Name": "DeviceType",
+  "Tag": "device",
+  "Value": "router"
+}]
+```
+
+#### Issues
+
+Tag: `issue`
+
+Compound structure that provides rich metadata for abstract _issues_ related with a given notification. Currently used by synthetics notifications.
+
+Each issue item has the same fields within (see below the example). The `Label` and `Name` attributes has minor meaning, all neccessary information about the issue is within the `Value`.
+
+Example:
+
+```jsonc
+[{
+  "Label": "Issue #1",
+  "Name": "Issue1",
+  "Tag": "issue",
+  "Value": {
+    "Description": "foo.kentik.com: PING ⇒ 208.76.14.180 went critical from healthy", // a summary of an issue
+    "DetailedInfo": [
+      // array of strings that provide more details on an issue
+      "Packet loss: 40.00% (critical)",
+      "Latency: 0.08ms (warning)",
+      "Jitter: 0.01ms (healthy)"
+    ],
+    "Labels": [
+      // labels applicable to this issue
+      {
+        "Color": "#ff0000",
+        "IsDark": true,
+        "Name": "MyAgentLabel"
+      }
+    ],
+    "Origin": "foo.kentik.com", // source of the issue
+    "Severity": "critical",
+    "Status": "critical",
+    "Target": "208.76.14.180", // target of the issue
+    "Type": "PING",
+    "Url": "http://portal.kentik.com/v4/synthetics/tests/1234/results/agent/266?start=1655472388",
+    "UrlLabel": "Open Task Details" // label for the URL
+  }
+}]
+```
+
+#### Statistics
+
+Tag: `statistic`
+
+General statistics metadata to provide context of the notification. Currently used by synthetics notifications.
+
+Example:
+
+```json
+[{
+  "Label": "Total sub-tests critical",
+  "Name": "TotalSubtestsCurrentlyCritical",
+  "Tag": "statistic",
+  "Value": 1,
+},
+{
+  "Label": "Total sub-tests critical on packet loss",
+  "Name": "PacketlossSubtestsCurrentlyCritical",
+  "Tag": "statistic",
+  "Value": 1
+},
+{
+  "Label": "Total sub-tests failing",
+  "Name": "TotalSubtestsCurrentlyFailing",
+  "Tag": "statistic",
+  "Value": 4
+},
+{
+  "Label": "Total sub-tests healthy",
+  "Name": "TotalSubtestsCurrentlyHealthy",
+  "Tag": "statistic",
+  "Value": 11
+}]
+```
+
+## Complete Template Examples
+
+Please refer to [templates directory](../templates/) for more inspiration.
 
 **Example - Using functions and ToMap**
 
@@ -402,3 +668,24 @@ This will result in the following JSON payload on render:
   "Type": "alarm"
 }
 ```
+
+## Tips and tricks with go-templating syntax
+
+### Parenthesis
+
+The order of the go-templating operator is not obvious and parenthesis may be necessary to guide the parser. For instance, in order to pick event details with a specific tag and convert it to a map, the snippet should be defined as:
+
+```go
+(.Details.WithTag "dimension").ToMap
+```
+
+### String message within single JSON field
+
+There are many webhooks that although use JSON format as the medium, they use a single field that can be HTML or Markdown to format nice message. This requires the output to be a single line string. The following hints might be helpful building it:
+
+- The `{{-`, `-}}` brackets are useful for removal of whitespace characters from the template.
+- Use `\n` to actually print the new line inside (when using it as the go function parameter, it has to be double-escaped: `"\\n"`).
+- Use `{{- /**/ -}}` for nicely formatting the template file while getting rid of new lines.
+
+
+See [Discord](../templates/discord.json.tmpl) (for Markdown) and [ServiceNow](../templates/servicenow_events.json.tmpl) (for plain text) templates for more inspiration on that.
