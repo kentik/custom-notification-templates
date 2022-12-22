@@ -1,0 +1,54 @@
+{{- /*
+How to create your Discord bot: https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+Webhook execute parameters: https://discord.com/developers/docs/resources/webhook#execute-webhook
+*/ -}}
+
+{
+{{- if .IsSingleEvent -}}
+  {{- with .Event -}}
+    "content": "
+      {{- /**/ -}}
+      **{{ $.Headline }}: {{ $.Summary -}}**\n
+      {{- /**/ -}}
+      **——————————————————————————————————————————**\n
+
+      {{- with $urls := .Details.WithTag "url" -}}
+        {{- if gt (len $urls) 0 -}}
+          {{- range $index, $url := $urls -}}
+            {{- joinWith $index " | " -}}
+            [{{- $url.LabelOrName -}}]({{ $url.Value }})
+          {{- end -}}
+          \n
+        {{- end -}}
+      {{- end -}}
+
+      {{- if not .IsInsight -}}
+        **State:** {{ .PreviousState }} → **{{ .CurrentState }}**\n**Timeframe:** {{ .StartTime }} (start) → **{{ .EndTime }}**\n
+      {{- end -}}
+
+      {{- range $index, $detail := .Details.General -}}
+        **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+      {{- end -}}
+
+      {{- with $dimensions := .Details.WithTag "dimension" -}}
+        {{- if gt (len $dimensions) 0 -}}
+          **Dimensions**:\n
+          {{- range $index, $detail := $dimensions -}}
+            - **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+
+      {{- with $metrics := .Details.WithTag "metric" -}}
+        {{- if gt (len $metrics) 0 -}}
+          **Metrics**:\n
+          {{- range $index, $detail := $metrics -}}
+            - **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    "
+  {{- end -}}
+{{- end -}}
+}

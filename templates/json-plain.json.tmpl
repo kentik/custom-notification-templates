@@ -7,8 +7,11 @@
       "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
       "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
       "Devices": {{- (.Details.WithTag "device").ToMap | j -}},
-      "DeviceLabels": {{- (.Details.WithTag "device_labels").ToMap | j -}},
-      "Links": {{- (.Details.WithTag "url").ToMap | j -}}
+      "DeviceLabels": {{- (.Details.WithTag "device_label").ToMap | j -}},
+      "Labels": {{- (.Details.WithTag "label") | j -}},
+      "Issues": {{- (.Details.WithTag "issue") | j -}},
+      "Statistics": {{- (.Details.WithTag "statistic") | j -}},
+      "Links": {{- (.Details.WithTag "url") | j -}}
     {{- end -}}
   {{- else -}}
   "Events": [
@@ -20,7 +23,10 @@
         "Metrics": {{- (.Details.WithTag "metric").ToMap | j -}},
         "Dimensions": {{- (.Details.WithTag "dimension").ToMap | j -}},
         "Devices": {{- (.Details.WithTag "device_labels").ToMap | j -}},
-        "DeviceLabels": {{- (.Details.WithTag "device_labels").ToMap | j -}},
+        "DeviceLabels": {{- (.Details.WithTag "device_label").ToMap | j -}},
+        "Labels": {{- (.Details.WithTag "label").ToMap | j -}},
+        "Issues": {{- (.Details.WithTag "issue").ToMap | j -}},
+        "Statistics": {{- (.Details.WithTag "statistic").ToMap | j -}},
         "Links": {{- (.Details.WithTag "url").ToMap | j -}}
       }
     {{- end -}}
