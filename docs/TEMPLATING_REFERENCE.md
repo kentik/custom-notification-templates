@@ -15,6 +15,7 @@ String functions transform string values for the notification context.
 - `toUpper` - Converts all string letters to uppercase.
 - `title` - Converts all letters at the beginning of words to uppercase.
 - `trimSpace` - Drops spaces from the beginning and ending of the string.
+- `split` - split the string (1st argument) by the separator (2nd argument).
 
 ### JSON Functions
 

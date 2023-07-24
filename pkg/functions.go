@@ -10,6 +10,7 @@ var TextTemplateFuncMap = template.FuncMap{
 	"toUpper":   strings.ToUpper,
 	"title":     strings.Title,
 	"trimSpace": strings.TrimSpace,
+	"split":     strings.Split,
 
 	"toJSON":          toJSON,
 	"j":               toJSON,
