@@ -294,6 +294,24 @@ var TestAlarm = &NotificationViewModel{
 					Tag:   "device",
 				},
 				&EventViewModelDetail{
+					Name:  "bits",
+					Label: "",
+					Value: 58555.9140625,
+					Tag:   "metric",
+				},
+				&EventViewModelDetail{
+					Name:  "packets",
+					Label: "",
+					Value: 11.200035095214844,
+					Tag:   "metric",
+				},
+				&EventViewModelDetail{
+					Name:  "unique_src_ip",
+					Label: "",
+					Value: 1,
+					Tag:   "metric",
+				},
+				&EventViewModelDetail{
 					Name:  "DeviceName",
 					Label: "Device",
 					Value: "MyGreatRouter",
@@ -433,7 +451,7 @@ var TestSynth = &NotificationViewModel{
 				},
 				&EventViewModelDetail{
 					Name:  "TestLabel1",
-					Value: map[string]interface{}{"Name": "MyTestLabel", "Color": "#00ffffff", "IsDark": false},
+					Value: map[string]interface{}{"Name": "Foo: MyTestLabel", "Color": "#00ffffff", "IsDark": false},
 					Tag:   "label",
 				},
 				&EventViewModelDetail{
