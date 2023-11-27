@@ -1,0 +1,75 @@
+{{- /*
+This is a template that produces JSON in a legacy format.
+The output must be well-formed JSON, properly escaped.
+See template documentation here: https://golang.org/pkg/text/template/
+*/ -}}
+
+{
+{{ if .IsSingleEvent -}}
+  {{- with .Event -}}
+    {{- if .IsAlarm -}}
+      "EventType":        "ALARM_STATE_CHANGE",
+      "AlarmID":          {{ .Details.GetValue "AlarmID" }},
+      "AlarmState":       "{{ .CurrentState }}",
+      "PolicyID":         {{ .Details.GetValue "AlarmPolicyID" }},
+      "ThresholdID":      {{ .Details.GetValue "AlarmThresholdID" }},
+      "ActivateSeverity": "{{.Details.GetValue "AlarmSeverity"}}",
+      "AlarmStart":       "{{ .StartTime }}",
+      "AlarmEnd":         "{{ .EndTime }}",
+      "AlertPolicyName":  "{{ .Details.GetValue "AlarmPolicyName" }}",
+      "AlarmsStateOld":   "{{ .PreviousState }}",
+      "AlertDimensions": {{(.Details.WithTag "dimension").Names | toJSON}},
+      {{- with $metrics := .Details.WithTag "metric" -}}
+        {{- if gt (len $metrics) 0 -}}
+          {{- with $metric := index $metrics 0 -}}
+          "AlertValue": {
+              "Unit": "{{- $metric.Name -}}",
+              "Value": {{- $metric.Value | toJSON -}}
+          },
+          {{- end -}}
+        {{- end -}}
+        {{- if gt (len $metrics) 1 -}}
+          {{- with $metric := index $metrics 1 -}}
+          "AlertValueSecond": {
+              "Unit": "{{- $metric.Name -}}",
+              "Value": {{- $metric.Value | toJSON -}}
+          },
+          {{- end -}}
+        {{- end -}}
+        {{- if gt (len $metrics) 2 -}}
+          {{- with $metric := index $metrics 2 -}}
+          "AlertValueThird": {
+              "Unit": "{{- $metric.Name -}}",
+              "Value": {{- $metric.Value | toJSON -}}
+          },
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+      "AlertKey": [
+        {{- range $index, $dimension := .Details.WithTag "dimension" -}}
+          {{- join $index -}}
+          {
+            "DimensionName": "{{- $dimension.Name -}}",
+            "DimensionValue": {{- $dimension.Value | toJSON -}}
+          }
+        {{- end -}}
+      ],
+    {{- else if .IsMitigation -}}
+      "EventType": "MITIGATION_STATE_CHANGE",
+      "MitigationID":   {{ .Details.GetValue "MitigationID" }},
+      "MitigationStart": "{{.StartTime}}",
+      "MitigationEnd": "{{.EndTime}}",
+      "MitigationStateNew": "{{.CurrentState}}",
+      "MitigationState": "{{.CurrentState}}",
+      "MitigationStateOld": "{{.PreviousState}}",
+      "MitigationMethodID": {{.Details.GetValue "MitigationMethodID"}},
+      "MitigationPlatformID": {{.Details.GetValue "MitigationPlatformID"}},
+      "MitigationPolicyID":         {{ .Details.GetValue "MitigationPolicyID" }},
+      "MitigationMethodName": "{{.Details.GetValue "MitigationMethodName"}}",
+      "MitigationPlatformName": "{{.Details.GetValue "MitigationPlatformName"}}",
+      "MitigationAlertIP": "{{.Details.GetValue "MitigationAlertIP"}}",
+    {{- end -}}
+  "CompanyID": {{ $.CompanyID }}
+  {{- end -}}
+{{- end -}}
+}
