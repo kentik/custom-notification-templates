@@ -14,8 +14,8 @@ See template documentation here: https://golang.org/pkg/text/template/
       "PolicyID":         {{ .Details.GetValue "AlarmPolicyID" }},
       "ThresholdID":      {{ .Details.GetValue "AlarmThresholdID" }},
       "ActivateSeverity": "{{.Details.GetValue "AlarmSeverity"}}",
-      "AlarmStart":       "{{ .StartTime }}",
-      "AlarmEnd":         "{{ .EndTime }}",
+      "AlarmStart":       "{{ timeRfc3339 .StartTime }}",
+      "AlarmEnd":         "{{ if eq .EndTime "ongoing" }}0001-01-01T00:00:00Z{{ else }}{{ timeRfc3339 .EndTime }}{{ end }}",
       "AlertPolicyName":  "{{ .Details.GetValue "AlarmPolicyName" }}",
       "AlarmsStateOld":   "{{ .PreviousState }}",
       "AlertDimensions": {{(.Details.WithTag "dimension").Names | toJSON}},
@@ -57,8 +57,8 @@ See template documentation here: https://golang.org/pkg/text/template/
     {{- else if .IsMitigation -}}
       "EventType": "MITIGATION_STATE_CHANGE",
       "MitigationID":   {{ .Details.GetValue "MitigationID" }},
-      "MitigationStart": "{{.StartTime}}",
-      "MitigationEnd": "{{.EndTime}}",
+      "MitigationStart": "{{timeRfc3339 .StartTime}}",
+      "MitigationEnd": "{{timeRfc3339 .EndTime}}",
       "MitigationStateNew": "{{.CurrentState}}",
       "MitigationState": "{{.CurrentState}}",
       "MitigationStateOld": "{{.PreviousState}}",
@@ -68,6 +68,12 @@ See template documentation here: https://golang.org/pkg/text/template/
       "MitigationMethodName": "{{.Details.GetValue "MitigationMethodName"}}",
       "MitigationPlatformName": "{{.Details.GetValue "MitigationPlatformName"}}",
       "MitigationAlertIP": "{{.Details.GetValue "MitigationAlertIP"}}",
+    {{- else -}}
+      {{- . | toJSON | explodeJSONKeys -}},
+      {{- .Details.General.ToMap | toJSON | explodeJSONKeys -}},
+      "Metrics": {{- (.Details.WithTag "metric").ToMap | toJSON -}},
+      "Dimensions": {{- (.Details.WithTag "dimension").ToMap | toJSON -}},
+      "Links": {{- (.Details.WithTag "url").ToMap | toJSON -}},
     {{- end -}}
   "CompanyID": {{ $.CompanyID }}
   {{- end -}}
