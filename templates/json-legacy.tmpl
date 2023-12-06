@@ -13,9 +13,11 @@ See template documentation here: https://golang.org/pkg/text/template/
       "AlarmState":       "{{ .CurrentState }}",
       "PolicyID":         {{ .Details.GetValue "AlarmPolicyID" }},
       "ThresholdID":      {{ .Details.GetValue "AlarmThresholdID" }},
+      "MitigationID":     "0",
       "ActivateSeverity": "{{.Details.GetValue "AlarmSeverity"}}",
       "AlarmStart":       "{{ timeRfc3339 .StartTime }}",
       "AlarmEnd":         "{{ if eq .EndTime "ongoing" }}0001-01-01T00:00:00Z{{ else }}{{ timeRfc3339 .EndTime }}{{ end }}",
+      "LastActivate":     "{{$.NowRFC3339}}",
       "AlertPolicyName":  "{{ .Details.GetValue "AlarmPolicyName" }}",
       "AlarmsStateOld":   "{{ .PreviousState }}",
       "AlertDimensions": {{(.Details.WithTag "dimension").Names | toJSON}},
@@ -45,6 +47,15 @@ See template documentation here: https://golang.org/pkg/text/template/
           {{- end -}}
         {{- end -}}
       {{- end -}}
+      {{- if gt (len (.Details.WithTag "metric")) 0 -}}
+        "AlertBaseline": {
+        {{- with $metric := index (.Details.WithTag "metric") 0 -}}
+            "Unit": "{{- $metric.Name -}}",
+        {{- end -}}
+            "Value": {{ if .Details.Has "Baseline" }}{{ .Details.GetValue "Baseline" | toJSON }}{{ else }}0{{ end }}
+        },
+      {{- end -}}
+      "AlertBaselineSource": "{{ .Details.GetValue "AlarmBaselineSource" }}",
       "AlertKey": [
         {{- range $index, $dimension := .Details.WithTag "dimension" -}}
           {{- join $index -}}
@@ -54,6 +65,16 @@ See template documentation here: https://golang.org/pkg/text/template/
           }
         {{- end -}}
       ],
+      "Links": {
+        "Dashboard": {
+          "Text": "Open in Dashboard",
+          "Value": "{{ .Details.GetValue "DashboardAlarmURL" }}"
+        },
+        "Explorer": {
+          "Text": "Open in Explorer",
+          "Value": "{{ .Details.GetValue "DetailsAlarmURL" }}"
+        }
+      },
     {{- else if .IsMitigation -}}
       "EventType": "MITIGATION_STATE_CHANGE",
       "MitigationID":   {{ .Details.GetValue "MitigationID" }},

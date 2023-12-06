@@ -264,6 +264,12 @@ var TestAlarm = &NotificationViewModel{
 					Tag:   "",
 				},
 				&EventViewModelDetail{
+					Name:  "Baseline",
+					Label: "Baseline Value",
+					Value: 777.654,
+					Tag:   "",
+				},
+				&EventViewModelDetail{
 					Name:  "AlarmBaselineSource",
 					Label: "Baseline Source",
 					Value: "ACT_BASELINE_MISSING_DEFAULT_INSTEAD_OF_LOWEST",
@@ -391,6 +397,12 @@ var TestSynth = &NotificationViewModel{
 					Name:  "TestID",
 					Label: "",
 					Value: 1228,
+					Tag:   "",
+				},
+				&EventViewModelDetail{
+					Name:  "AlarmID",
+					Label: "",
+					Value: 1222228,
 					Tag:   "",
 				},
 				&EventViewModelDetail{
