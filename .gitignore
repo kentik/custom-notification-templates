@@ -15,4 +15,4 @@
 vendor/
 
 # Output directory files
-output/*.json
+output/

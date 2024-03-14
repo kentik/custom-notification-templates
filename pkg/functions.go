@@ -23,6 +23,10 @@ var TextTemplateFuncMap = template.FuncMap{
 	"timeRfc3339":     timeRfc3339,
 	"join":            join,
 	"joinWith":        joinWith,
+
+	"importanceLabel":   importanceLabel,
+	"importanceToColor": importanceToColor,
+	"importanceToEmoji": importanceToEmoji,
 }
 
 func tryParseTime(input string) (time.Time, error) {
@@ -111,4 +115,29 @@ func explodeJSONKeys(s string) string {
 		return compacted[1 : len(compacted)-1]
 	}
 	return "explodeJSONKeysErr"
+}
+
+func importanceToColor(severity ViewModelImportance) string {
+	if color, ok := ImportanceToColors[severity]; ok {
+		return color
+	}
+	return ""
+}
+
+func importanceName(severity ViewModelImportance) string {
+	if label, ok := ImportanceNames[severity]; ok {
+		return label
+	}
+	return ""
+}
+
+func importanceLabel(severity ViewModelImportance) string {
+	return strings.Title(importanceName(severity))
+}
+
+func importanceToEmoji(severity ViewModelImportance) string {
+	if emoji, ok := ImportanceToEmojis[severity]; ok {
+		return emoji
+	}
+	return ""
 }
