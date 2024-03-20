@@ -41,6 +41,39 @@ var VieModelImportanceOrdered = [...]ViewModelImportance{
 	ViewModelImportance_None,
 }
 
+var ImportanceNames = map[ViewModelImportance]string{
+	ViewModelImportance_None:     "n/a",
+	ViewModelImportance_Healthy:  "healthy",
+	ViewModelImportance_Notice:   "notice",
+	ViewModelImportance_Minor:    "minor",
+	ViewModelImportance_Warning:  "warning",
+	ViewModelImportance_Major:    "major",
+	ViewModelImportance_Severe:   "severe",
+	ViewModelImportance_Critical: "critical",
+}
+
+var ImportanceToColors = map[ViewModelImportance]string{
+	ViewModelImportance_None:     "#999999",
+	ViewModelImportance_Healthy:  "#1E9E1E",
+	ViewModelImportance_Notice:   "#157FF3",
+	ViewModelImportance_Minor:    "#F29D49",
+	ViewModelImportance_Warning:  "#EE7E0F",
+	ViewModelImportance_Major:    "#DB3737",
+	ViewModelImportance_Severe:   "#C23030",
+	ViewModelImportance_Critical: "#A82A2A",
+}
+
+var ImportanceToEmojis = map[ViewModelImportance]string{
+	ViewModelImportance_None:     "",
+	ViewModelImportance_Healthy:  ":warning:",
+	ViewModelImportance_Notice:   ":warning:",
+	ViewModelImportance_Minor:    ":warning:",
+	ViewModelImportance_Warning:  ":warning:",
+	ViewModelImportance_Major:    ":warning:",
+	ViewModelImportance_Severe:   ":warning:",
+	ViewModelImportance_Critical: ":warning:",
+}
+
 // use "export" key instead of standard json key when marshalling/unmarshalling using jsoniter (https://github.com/json-iterator/go),
 // so fields are not removed per standard json tag
 type EventViewModel struct {

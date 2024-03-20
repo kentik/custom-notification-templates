@@ -1,0 +1,146 @@
+{{- /* This slack template renders colored bars on the left-hand side of messages by "hacking" the
+messages to add an attachment for each message that is to have a different colored bar. The
+attachment element has been deprectated by Slack and could be removed at any time so use this
+template at your own risk.
+
+See Slack docs:
+https://api.slack.com/messaging/webhooks
+https://api.slack.com/block-kit
+
+Documentation regarding this hack:
+https://api.slack.com/messaging/attachments-to-blocks#direct_equivalents Search for "color" on that page.
+https://api.slack.com/reference/messaging/attachments Search for "color" on this page too.
+*/ -}}
+
+{{- /*
+Slack:
+0) if explicit to do digest, do that
+1) if one custom insight, display with old style (like alarms)
+2) if only insights, display as a digest
+*/ -}}
+{{- with .Event -}}
+{
+  "attachments": [
+    {
+      "color": "{{- importanceToColor .Importance -}}",
+      "blocks": [
+        {
+          "type": "divider"
+        },
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "emoji": true,
+            "text": "
+              {{- importanceToEmoji .Importance }} {{ importanceLabel .Importance -}}\n{{- $.Summary -}}
+              {{- range $index, $label := (.Details.WithTag "label").Values -}}
+                {{ " " }}[{{- $label.Name -}}]
+              {{- end -}}
+            "
+          }
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "{{ $.Headline }} for *{{ $.CompanyName }}* sent on {{ $.NowDatetime }}"
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "
+              {{- if not .IsInsight -}}
+                *State:* {{ .PreviousState }} → *{{ .CurrentState }}*\n*Timeframe:* {{ .StartTime }} (start) → *{{ .EndTime }}*\n
+              {{- end -}}
+              {{- range $index, $detail := .Details.General -}}
+                *{{ $detail.LabelOrName }}*: {{ $detail.Value }}\n
+              {{- end -}}
+              {{- with $dimensions := .Details.WithTag "dimension" -}}
+                {{- if gt (len $dimensions) 0 -}}
+                  *Dimensions*:\n
+                  {{- range $index, $detail := $dimensions -}}
+                    {{- if (and (eq "i_device_id" $detail.Name) ($.Event.Details.Has "DeviceName")) -}}
+                      - *Device*: {{ $.Event.Details.GetValue "DeviceName" -}}
+                        {{- if $.Event.Details.Has "DeviceType" }} ({{ $.Event.Details.GetValue "DeviceType" }}) {{ end -}}
+                        {{- range $index, $label := ($.Event.Details.WithTag "device_label").Values -}}
+                          [{{- $label.Name -}}]
+                        {{- end -}}
+                        {{- "\\n" -}}
+                    {{- else -}}
+                      - *{{ $detail.LabelOrName }}*: {{ $detail.Value }}\n
+                    {{- end -}}
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with $metrics:= .Details.WithTag "metric" -}}
+                {{- if gt (len $metrics) 0 -}}
+                  *Metrics*:\n
+                  {{- range $index, $metric := $metrics -}}
+                    - {{ $metric.Value }} {{ $metric.LabelOrName }}\n
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with $stats := .Details.WithTag "statistic" -}}
+                {{- if gt (len $stats) 0 -}}
+                  *Summary*:\n
+                  {{- range $index, $detail := $stats -}}
+                    - *{{ $detail.LabelOrName }}*: {{ $detail.Value }}\n
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+              {{- with $issues := (.Details.WithTag "issue").Values -}}
+                {{- if gt (len $issues) 0 -}}
+                  *Issues*:\n
+                  {{- range $index, $issue := $issues -}}
+                    - {{ range $index, $label := $issue.Labels -}}
+                        [{{- $label.Name -}}]{{ " " }}
+                      {{- end -}}
+                      *{{ $issue.Description }}*
+                      {{- if $issue.DetailedInfo }}: {{ end -}}
+                      {{- range $index, $detailedItem := $issue.DetailedInfo -}}
+                        {{- joinWith $index ", " -}}
+                        {{- $detailedItem -}}
+                      {{- end -}}
+
+                      {{- if $issue.Url -}}
+                      {{- " " }}- <{{ $issue.Url }}|{{ if $issue.UrlLabel }}{{ $issue.UrlLabel }}{{ else }}More details{{ end }} »>
+                      {{- end -}}
+                      \n
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+            "
+          }
+        },
+        {
+          "type": "actions",
+          "elements": [
+            {{- range $index, $url := .Details.WithTag "url" -}}
+            {{- join $index -}}
+            {
+              "type": "button",
+              "action_id": "{{- $url.Name -}}",
+              "text": {
+                "type": "plain_text",
+                "text": "{{- $url.LabelOrName -}}"
+              },
+              "url": "{{ $url.Value }}"
+            }
+            {{- end -}}
+          ]
+        }
+      ]
+    }
+  ]
+}
+{{- end -}}
+
+{{- /*
+Note: In this v1 channel, only one event is expected to be sent at a time,
+so there is no case for multiple events.
+*/ -}}
