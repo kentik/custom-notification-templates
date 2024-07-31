@@ -311,7 +311,7 @@ Example:
 [{
   "Label": "ID",
   "Name": "AlarmID",
-  "Value": "216148908",
+  "Value": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
 },
 {
   "Label": "Severity",
@@ -580,7 +580,7 @@ This will result in the following JSON payload on render:
 {
   "custom": {
     "AlarmBaselineSource": "ACT_BASELINE_MISSING_DEFAULT_INSTEAD_OF_LOWEST",
-    "AlarmID": 197790253,
+    "AlarmID": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
     "AlarmPolicyID": 297,
     "AlarmPolicyName": "DDoS Protect Policy",
     "AlarmSeverity": "critical",
@@ -635,7 +635,7 @@ This will result in the following JSON payload on render:
 ```json
 {
   "AlarmBaselineSource": "ACT_BASELINE_MISSING_DEFAULT_INSTEAD_OF_LOWEST",
-  "AlarmID": 197790253,
+  "AlarmID": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
   "AlarmPolicyID": 297,
   "AlarmPolicyName": "DDoS Protect Policy",
   "AlarmSeverity": "critical",

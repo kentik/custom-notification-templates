@@ -236,7 +236,7 @@ var TestAlarm = &NotificationViewModel{
 				&EventViewModelDetail{
 					Name:  "AlarmID",
 					Label: "ID",
-					Value: 197790252,
+					Value: "0190db1d-5d37-70a8-95bd-4092c918ecbe",
 					Tag:   "",
 				},
 				&EventViewModelDetail{
@@ -402,7 +402,7 @@ var TestSynth = &NotificationViewModel{
 				&EventViewModelDetail{
 					Name:  "AlarmID",
 					Label: "",
-					Value: 1222228,
+					Value: "0190db1d-5d37-70a8-95bd-4092c918ecbe",
 					Tag:   "",
 				},
 				&EventViewModelDetail{
@@ -565,7 +565,7 @@ var TestMitigation = &NotificationViewModel{
 				&EventViewModelDetail{
 					Name:  "MitigationAlarmID",
 					Label: "Alarm ID",
-					Value: 197790252,
+					Value: "0190db1d-5d37-70a8-95bd-4092c918ecbe",
 					Tag:   "",
 				},
 				&EventViewModelDetail{
