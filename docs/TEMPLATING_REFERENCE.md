@@ -151,11 +151,12 @@ This will result in the following JSON payload on render:
 - `IsActive` *boolean* - Indicates whether the event is considered active (the trigger causing the event to be propagated is ongoing).
 - `StartTime` *string* - RFC-3339-formatted timestamp displays when the trigger first occurred.
 - `EndTime` *string* - RFC-3339-formatted timestamp displays when the trigger stopped occurring, or displays the string `ongoing` if it is still active.
-- `CurrentState` *string* - Current state of the trigger (depends on the type of state).
-- `PreviousState` *string* - Previous state of the trigger (depends on the type of state).
+- `CurrentState` *string* - Current state of the notification trigger (depends on the type of state, hence it is only descriptive).
+- `PreviousState` *string* - Previous state of the notification trigger (depends on the type of state, hence it is only descriptive).
 - `StartTimestamp` *integer* - Unix timestamp of when the trigger first occurred.
 - `EndTimestamp` *integer* - Unix timestamp of when the trigger stopped occurring.
 - `Details` *array of objects* - Type-specific properties collection grouped by tags.
+- `Importance`
 
 **Example - JSON template for immediate notifications with a custom header:**
 

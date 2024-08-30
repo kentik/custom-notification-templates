@@ -1,0 +1,39 @@
+{{- /*
+This is a template that produces JSON.
+The output must be well-formed JSON, properly escaped.
+See template documentation here: https://golang.org/pkg/text/template/
+*/ -}}
+
+{
+  {{- . | toJSON | explodeJSONKeys -}},
+  {{- if .IsSingleEvent  -}}
+    {{- with .Event -}}
+      {{- . | toJSON | explodeJSONKeys -}},
+      {{- .Details.General.ToMap | toJSON | explodeJSONKeys -}},
+      "Metrics": {{- (.Details.WithTag "metric").ToMap | toJSON -}},
+      "Dimensions": {{- (.Details.WithTag "dimension").ToMap | toJSON -}},
+      "Links": {{- (.Details.WithTag "url").ToMap | toJSON -}},
+      "statistic": {{- (.Details.WithTag "statistic").ToMap | toJSON -}},
+      "issue": {{- (.Details.WithTag "issue").Values | toJSON -}}
+    {{- end -}}
+  {{- else -}}
+  "Events": [
+    {{- range $index, $event := .Events -}}
+      {{- join $index -}}
+      {
+        {{- . | toJSON | explodeJSONKeys -}},
+        {{- .Details.General.ToMap | toJSON | explodeJSONKeys -}},
+        "Metrics": {{- (.Details.WithTag "metric").ToMap | toJSON -}},
+        "Dimensions": {{- (.Details.WithTag "dimension").ToMap | toJSON -}},
+        "Links": {{- (.Details.WithTag "url").ToMap | toJSON -}},
+        "statistic": {{- (.Details.WithTag "statistic").ToMap | toJSON -}},
+        "issue": {{- (.Details.WithTag "issue").Values | toJSON -}}
+      }
+    {{- end -}}
+  ]
+  {{- end -}}
+}
+{{- /*
+Note: In this v1 channel, only one event is expected to be sent at a time,
+so there is no case for multiple events.
+*/ -}}
