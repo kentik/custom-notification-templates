@@ -155,7 +155,7 @@ This will result in the following JSON payload on render:
 - `PreviousState` *string* - Previous state of the notification trigger (depends on the type of state, hence it is only descriptive).
 - `StartTimestamp` *integer* - Unix timestamp of when the trigger first occurred.
 - `EndTimestamp` *integer* - Unix timestamp of when the trigger stopped occurring.
-- `Details` *array of objects* - Type-specific properties collection grouped by tags.
+- `Details` *array of objects* - Type-specific properties collection grouped by tags. [Details reference](EVENT_VIEW_MODEL_DETAILS_REFERENCE.md)
 - `Importance`
 
 **Example - JSON template for immediate notifications with a custom header:**
@@ -221,6 +221,8 @@ The following filtering methods return a details object, so that other Detail me
 - `Details.General` - Filter out the general details (i.e. details without any tag specified).
 - `Details.WithTag tag` - Filter the details to show those with the given tag.
 - `Details.WithNames ...names` - Filter the details to display only those with the given names.
+
+Comprehensive [details reference here](EVENT_VIEW_MODEL_DETAILS_REFERENCE.md).
 
 **Example - Template rendering all event URLs and metrics:**
 

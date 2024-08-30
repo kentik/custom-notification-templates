@@ -12,7 +12,7 @@ Within the [Templates](templates/) directory you can find ready, baseline custom
 
 ## Using Custom Webhook Templating
 
-[Using Custom Webhook Templating](docs/TEMPLATING_REFERENCE.md) provides comprehensive details on how notifications are being rendered and what syntax, variables, methods and functions are available. It can help you get familiar with how to develop new templates and how to customize your existing ones.
+[Using Custom Webhook Templating](docs/TEMPLATING_REFERENCE.md) provides comprehensive details on how notifications are being rendered and what syntax, variables, methods and functions are available. Additionally, refer to [EventViewModel Details reference](docs/EVENT_VIEW_MODEL_DETAILS_REFERENCE.md) to learn what kind of information is provided within the notifications. It can help you get familiar with how to develop new templates and how to customize your existing ones.
 
 ## How to Develop and Test New Template
 
