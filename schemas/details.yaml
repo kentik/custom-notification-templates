@@ -21,6 +21,7 @@
       - clear
       - minor
       - major
+      - warning
       - severe
       - critical
 - Name: AlarmThresholdID
@@ -62,6 +63,7 @@
       - Minor
       - Major
       - Severe
+      - Warning
       - Critical
 - Name: AlarmPolicyApplication
   When: Alerting alarm state changes
@@ -77,12 +79,12 @@
 - Name: AlarmPolicyDashboardID
   Tag: misc
   When: Alerting alarm state changes
-  Description: Policy Dashboard ID
+  Description: Alerting Policy Dashboard ID. Usage discouraged.
   Examples:
-    - "123456"
+    - 123456
   Value:
     $schema: https://json-schema.org/draft/2020-12/schema
-    type: string
+    type: number
 
 - Name: AlarmPolicyMetadataSubType
   When: NMS application alarm state changes
@@ -169,14 +171,16 @@
 
 - Tag: metric
   When: Alerting alarm state changes
-  Description: Alarm metric values. Name represents the metric name and Value represents the metric value
+  Description: Alarm metric values. Name represents the metric name and Value represents the metric value. Please note the type may vary!
   Examples:
     - 123456
     - 10000.13
-    - 42
+    - "down"
   Value:
     $schema: https://json-schema.org/draft/2020-12/schema
-    type: number
+    anyOf:
+      - type: number
+      - type: string
 
 - Name: Baseline
   When: NMS application alarm state changes
@@ -251,8 +255,7 @@
     $schema: https://json-schema.org/draft/2020-12/schema
     type: string
 
-- Name: DeviceLabel([\d]+)
-  Tag: device_label
+- Tag: device_label
   Description: Array of objects representing a list of device labels for a policy with device as a dimension
   When: Alerting alarm state changes for a policy with device as a dimension
   Examples:
@@ -274,6 +277,13 @@
         type: string
       Type:
         type: string
+
+# To be added:
+# DeviceIPAddress DeviceSysDescription DeviceSysObjectID DeviceLocation
+# DeviceVendor DeviceModel DeviceProductName DeviceOSName DeviceOSVersion
+# DeviceSerialNumber DeviceStatus
+# InterfaceName InterfaceID InterfaceSNMPIndex InterfaceDescription
+# InterfaceCapacity InterfaceAdminStatus InterfaceOperStatus
 
 - Name: AlarmPolicyLabels
   Description: Comma-separated list of source policy labels
@@ -316,6 +326,16 @@
   Value:
     $schema: https://json-schema.org/draft/2020-12/schema
     type: string
+
+- Name: RuleID
+  When: Alerting alarm state changes
+  Description: UUID v7 for the rule - alerting system configuration ID. Usage discouraged.
+  Examples:
+    - 0190db1d-5d37-70a8-95bd-4092cafebabe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uuid
 
 - Name: MitigationID
   Description: Mitigation unique ID
@@ -518,10 +538,10 @@
   When: Synthetics Test health state change
   Description: Synthetic test unique ID
   Examples:
-    - 123456
+    - "123456"
   Value:
     $schema: https://json-schema.org/draft/2020-12/schema
-    type: number
+    type: string
 
 - Name: TestType
   When: Synthetics Test health state change
@@ -532,10 +552,9 @@
     $schema: https://json-schema.org/draft/2020-12/schema
     type: string
 
-- Name: TestLabel([\d]+)
-  Tag: label
-  When: Synthetics Test health state change
-  Description: Synthetic test assigned label
+- Tag: label
+  When: Synthetics Test health state change and others
+  Description: Assigned label
   Examples:
     - Name: foo
       Color: "#ff6600"
@@ -553,6 +572,120 @@
         type: string
       Type:
         type: string
+
+- Tag: statistic
+  When: Synthetics Test health state change
+  Description: Statistical information for the test
+  Examples:
+    - 18
+    - "1 (5.56%)"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    anyOf:
+      - type: number
+      - type: string
+
+- Name: OriginAgentName
+  Tag: origin
+  When: Synthetics Test health state change
+  Description: Origin agent name for synthetic test
+  Examples:
+    - Sydney, Australia
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: OriginAgentId
+  Tag: origin
+  When: Synthetics Test health state change
+  Description: Origin agent name for synthetic test. Usage discouraged
+  Examples:
+    - 123456
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: number
+
+- Name: OriginAgentDetails
+  Tag: url
+  When: Origin agent details URL
+  Description: Origin agent name for synthetic test. Usage discouraged
+  Examples:
+    - https://portal.our1.kentik.com/v4/synthetics/agents/123456/summary
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Tag: issue
+  When: Synthetics Test health state change
+  Description: Issue information for the test
+  Examples:
+    - Description: 'Bangalore, India: PING ⇒ Sydney, Australia warning'
+      DetailedInfo:
+      - 'Packet Loss: 20.00% (warning)'
+      - 'Jitter: 0.11ms (healthy)'
+      - 'Latency: 234.10ms (healthy)'
+      Labels: []
+      Origin: Bangalore, India
+      Severity: warning
+      Status: warning
+      Target: 172.105.181.24
+      TargetAgent: '274'
+      TargetName: Sydney, Australia
+      Type: PING
+      Url: https://portal.our1.kentik.com/v4/synthetics/tests/5476/results/agent/300/274?start=1725361200
+      UrlLabel: Open Subtest Details
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: object
+    properties:
+      Description:
+        type: string
+      DetailedInfo:
+        type: array
+        items:
+          type: string
+      Labels:
+        type: array
+        items:
+          type: object
+          properties:
+            Name:
+              type: string
+            Value:
+              type: string
+            Color:
+              type: string
+            IsDark:
+              type: boolean
+            Type:
+              type: string
+      Origin:
+        type: string
+      Severity:
+        type: string
+      Status:
+        type: string
+      Target:
+        type: string
+      TargetAgent:
+        type: string
+      TargetName:
+        type: string
+      Type:
+        type: string
+      Url:
+        type: string
+        format: uri
+      UrlLabel:
+        type: string
+
+# To be added:
+# SynthType OriginAgentName OriginAgentId OriginAgentDetails
+# issues
+# statistics
+# TotalSubtestsCurrentlyCritical LatencySubtestsCurrentlyCritical TotalSubtestsCurrentlyWarning LatencySubtestsCurrentlyWarning TotalSubtestsCurrentlyHealthy JitterSubtestsCurrentlyHealthy PacketLossSubtestsCurrentlyHealth
+# RuleID
 
 - Name: SyntheticsTestURL
   Tag: url
