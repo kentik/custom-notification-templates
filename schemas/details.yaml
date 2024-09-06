@@ -1,0 +1,699 @@
+---
+- Name: AlarmID
+  When: Alerting alarm state changes
+  Description: UUID v7 for the alarm
+  Examples:
+    - 0190db1d-5d37-70a8-95bd-4092c918ecbe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uuid
+- Name: AlarmSeverity
+  When: Alerting alarm state changes
+  Description: Alarm severity information
+  Examples:
+    - major
+    - severe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    enum:
+      - clear
+      - minor
+      - major
+      - warning
+      - severe
+      - critical
+- Name: AlarmThresholdID
+  When: Alerting alarm state changes
+  Description: ID of the Alerting Policy Threshold. Today it is a number in string, but this should not be assumed as such. Can be UUID or other in future. Will stay as string.
+  Examples:
+    - "12716"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+- Name: AlarmPolicyID
+  When: Alerting alarm state changes
+  Description: ID of the Alerting Policy. Today it is a number in string, but this should not be assumed as such. Can be UUID or other in future. Will stay as string.
+  Examples:
+    - "4085"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+- Name: AlarmPolicyName
+  When: Alerting alarm state changes
+  Description: Descriptive name of the Alerting Policy.
+  Examples:
+    - "V4 DDoS - UDP Flood"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+- Name: AlarmSeverityLabel
+  When: Alerting alarm state changes
+  Description: Label
+  Deprecated: true
+  Examples:
+    - Severe
+    - Critical
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    enum:
+      - Clear
+      - Minor
+      - Major
+      - Severe
+      - Warning
+      - Critical
+- Name: AlarmPolicyApplication
+  When: Alerting alarm state changes
+  Description: Policy Application type the alarm belongs to
+  Examples:
+    - ddos
+    - core
+    - query-to-policy
+    - kmetrics
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+- Name: AlarmPolicyDashboardID
+  Tag: misc
+  When: Alerting alarm state changes
+  Description: Alerting Policy Dashboard ID. Usage discouraged.
+  Examples:
+    - 123456
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: number
+
+- Name: AlarmPolicyMetadataSubType
+  When: NMS application alarm state changes
+  Description: Policy Sub Type
+  Examples:
+    - bgp_neighbors
+    - interfaces
+    - devices
+    - custom
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: AlarmParentPolicyID
+  Description: Parent Policy ID
+  When: Alerting alarm state changes
+  Examples:
+    - "123456"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: AlertingSearchURL
+  Tag: url
+  Description: Hyperlink to the alerting search URL
+  When: Alerting alarm state changes
+  Examples:
+    - https://portal.kentik.com/v4/alerting/search/0190db1d-5d37-70a8-95bd-4092c918ecbe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: AlarmBaselineSource
+  Description: Baseline source code information, internal meaning. Use AlarmBaselineDescription for descriptive information instead.
+  Tag: misc
+  When: Alerting alarm state changes
+  Examples:
+    - 0
+    - 5
+    - 15
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: integer
+- Name: AlarmBaselineDescription
+  Description: Baseline source descriptive code information
+  When: Alerting alarm state changes
+  Examples:
+    - ACT_NOT_USED_BASELINE
+    - ACT_BASELINE_USED_FOUND
+    - ACT_BASELINE_MISSING_DEFAULT_INSTEAD_OF_HIGHEST
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: AlarmPolicyMetadataType
+  Description: Policy Type
+  When: NMS application alarm state changes
+  Examples:
+    - UpDown
+    - MetricsThreshold
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: bgp_neighbor
+  When: NMS application alarm state changes
+  Examples: [TBD]
+  Description: TBD
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: dimension
+  When: Alerting alarm state changes
+  Description: Alarm dimension information. Name represents the dimension name and Value represents the dimension value
+  Examples:
+    - 1.1.2.3/16
+    - Arizona, US
+    - 237.84.2.178/24
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: metric
+  When: Alerting alarm state changes
+  Description: Alarm metric values. Name represents the metric name and Value represents the metric value. Please note the type may vary!
+  Examples:
+    - 123456
+    - 10000.13
+    - "down"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    anyOf:
+      - type: number
+      - type: string
+
+- Name: Baseline
+  When: NMS application alarm state changes
+  Description: Baseline value for the main metric (non-zero if the alarm is triggered with baselines used)
+  Examples:
+    - 42.25
+    - 10001.0
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: number
+
+- Name: DashboardAlarmURL
+  Tag: url
+  When: Alerting alarm state changes
+  Description: Hyperlink to the alarm dashboard
+  Examples:
+    - https://portal.kentik.com/v4/alerting/dashboard/123456/0190db1d-5d37-70a8-95bd-4092c918ecbe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: DetailsAlarmURL
+  Tag: url
+  When: Alerting alarm state changes
+  Description: Hyperlink to alarm details
+  Examples:
+    - https://portal.kentik.com/v4/alerting/0190db1d-5d37-70a8-95bd-4092c918ecbe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: DeviceId
+  Description: Device ID
+  Tag: device
+  When: Alerting alarm state changes for a policy with device as a dimension
+  Examples:
+    - "123456"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: DeviceName
+  Description: Device name
+  Tag: device
+  When: Alerting alarm state changes
+  Examples:
+    - c435b_iad2_kentik_com
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: DeviceType
+  Description: Device type
+  Tag: device
+  When: Alerting alarm state changes for a policy with device as a dimension
+  Examples:
+  - router
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: DeviceLabels
+  Tag: device_labels
+  Description: Comma-separated list of device labels for a policy with device as a dimension
+  When: Alerting alarm state changes for a policy with device as a dimension
+  Examples:
+    - foo, bar, baz
+    - routers, network, cloud
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: device_label
+  Description: Array of objects representing a list of device labels for a policy with device as a dimension
+  When: Alerting alarm state changes for a policy with device as a dimension
+  Examples:
+    - Name: foo
+      Color: "#ff0000"
+      IsDark: true
+    - Name: bar
+      Color: "#66ff66"
+      IsDark: false
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: object
+    properties:
+      Name:
+        type: string
+      Value:
+        type: string
+      Color:
+        type: string
+      Type:
+        type: string
+
+# To be added:
+# DeviceIPAddress DeviceSysDescription DeviceSysObjectID DeviceLocation
+# DeviceVendor DeviceModel DeviceProductName DeviceOSName DeviceOSVersion
+# DeviceSerialNumber DeviceStatus
+# InterfaceName InterfaceID InterfaceSNMPIndex InterfaceDescription
+# InterfaceCapacity InterfaceAdminStatus InterfaceOperStatus
+
+- Name: AlarmPolicyLabels
+  Description: Comma-separated list of source policy labels
+  When: Alerting alarm state changes for a policy with labels
+  Examples:
+    - foo, bar, baz
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: policy_label
+  Description: Array of objects representing a list of source policy labels
+  When: Alerting alarm state changes for a policy with labels
+  Examples:
+    - Name: foo
+      Color: "#ff0000"
+      IsDark: true
+    - Name: bar
+      Color: "#66ff66"
+      IsDark: false
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: object
+    properties:
+      Name:
+        type: string
+      Value:
+        type: string
+      Color:
+        type: string
+      Type:
+        type: string
+
+- Name: AlarmPolicyApplicationMetadata
+  Tag: misc
+  Description: Policy Metadata as stringified JSON format. Usage discouraged.
+  When: Alerting alarm state changes
+  Examples:
+    - "{}"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: RuleID
+  When: Alerting alarm state changes
+  Description: UUID v7 for the rule - alerting system configuration ID. Usage discouraged.
+  Examples:
+    - 0190db1d-5d37-70a8-95bd-4092cafebabe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uuid
+
+- Name: MitigationID
+  Description: Mitigation unique ID
+  When: Mitigation state transition
+  Examples:
+    - "123456789"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationType
+  Description: Mitigation type
+  When: Mitigation state transition
+  Examples:
+    - manual
+    - auto
+
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    enum:
+      - manual
+      - auto
+
+- Name: MitigationPolicyID
+  Description: Policy ID of the alarm that triggered mitigation
+  When: Mitigation state transition
+  Examples:
+    - "123465"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationPolicyName
+  Description: Policy name of the alarm that triggered mitigation
+  When: Mitigation state transition
+  Examples:
+    - "V4 DDoS - UDP Flood"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationPlatformID
+  Description: Platform ID for the mitigation
+  When: Mitigation state transition
+  Examples:
+    - "1234567"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationPlatformName
+  Description: Platform name for the mitigation
+  When: Mitigation state transition
+  Examples:
+    - BlackHole-Mitigation
+    - pnap_all
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationMethodID
+  Description: Platform method ID for the mitigation
+  When: Mitigation state transition
+  Examples:
+    - "1234567"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationMethodName
+  Description: Platform method name for the mitigation
+  When: Mitigation state transition
+  Examples:
+    - BlackHole_SOC
+    - PhoenixNAP_Route_Injection
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+
+- Name: MitigationAlarmID
+  Description: Alarm ID for the alarm that triggered the mitigation
+  When: Mitigation state transition
+  Examples:
+    - 0190db1d-5d37-70a8-95bd-4092c918ecbe
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationAlertIP
+  Description: Target Alert IP/CIDR for the mitigation
+  When: Mitigation state transition
+  Examples:
+    - 10.0.0.2/24
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: LastMitigationEvent
+  Description: Detailed event name for the mitigation transition that triggered the notification
+  When: Mitigation state transition
+  Examples:
+    - skipWait
+    - start
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: MitigationURL
+  Tag: url
+  Description: Hyperlink to mitigation details in Kentik Portal
+  When: Mitigation state transition
+  Examples:
+    - https://portal.kentik.com/v4/protect/mitigations/123456789
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: InsightID
+  When: Insight information is provided
+  Description: Insight unique ID
+  Examples:
+    - a430344572
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: InsightName
+  When: Insight information is provided
+  Description: Insight system name
+  Examples:
+    - core.networkHealth.deviceTrafficIncrease
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: InsightDataSourceType
+  When: Insight information is provided
+  Description: Insight data source type
+  Examples:
+    - alerting
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: InsightPlainDescription
+  When: Insight information is provided
+  Description: Insight human-readable description
+  Examples:
+    - Device c435b_iad2_kentik_com received 1055% more traffic than usual at this time of day
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: InsightDetailsURL
+  Tag: url
+  When: Insight information is provided
+  Description: Hyperlink to insight details
+  Examples:
+    - https://portal.kentik.com/v4/operate/insights/123456789
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: InsightsSeverityURL
+  Tag: url
+  When: Insight information is provided
+  Description: Hyperlink to insight search page with given severity
+  Examples:
+    - https://portal.kentik.com/v4/operate/insights?severities=major
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: InsightsMainURL
+  Tag: url
+  When: Insight information is provided
+  Description: Hyperlink to insight dashboard page
+  Examples:
+    - https://portal.kentik.com/v4/operate/insights
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Name: TestName
+  When: Synthetics Test health state change
+  Description: Synthetic test name
+  Examples:
+    - https://www.youtube.com/ - Page Load + Ping + Trace
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: TestID
+  When: Synthetics Test health state change
+  Description: Synthetic test unique ID
+  Examples:
+    - "123456"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: TestType
+  When: Synthetics Test health state change
+  Description: Synthetic test type
+  Examples:
+    - page_load
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Tag: label
+  When: Synthetics Test health state change and others
+  Description: Assigned label
+  Examples:
+    - Name: foo
+      Color: "#ff6600"
+      IsDark: false
+      Type: synth_test
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: object
+    properties:
+      Name:
+        type: string
+      Value:
+        type: string
+      Color:
+        type: string
+      Type:
+        type: string
+
+- Tag: statistic
+  When: Synthetics Test health state change
+  Description: Statistical information for the test
+  Examples:
+    - 18
+    - "1 (5.56%)"
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    anyOf:
+      - type: number
+      - type: string
+
+- Name: OriginAgentName
+  Tag: origin
+  When: Synthetics Test health state change
+  Description: Origin agent name for synthetic test
+  Examples:
+    - Sydney, Australia
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+
+- Name: OriginAgentId
+  Tag: origin
+  When: Synthetics Test health state change
+  Description: Origin agent name for synthetic test. Usage discouraged
+  Examples:
+    - 123456
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: number
+
+- Name: OriginAgentDetails
+  Tag: url
+  When: Origin agent details URL
+  Description: Origin agent name for synthetic test. Usage discouraged
+  Examples:
+    - https://portal.our1.kentik.com/v4/synthetics/agents/123456/summary
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri
+
+- Tag: issue
+  When: Synthetics Test health state change
+  Description: Issue information for the test
+  Examples:
+    - Description: 'Bangalore, India: PING ⇒ Sydney, Australia warning'
+      DetailedInfo:
+      - 'Packet Loss: 20.00% (warning)'
+      - 'Jitter: 0.11ms (healthy)'
+      - 'Latency: 234.10ms (healthy)'
+      Labels: []
+      Origin: Bangalore, India
+      Severity: warning
+      Status: warning
+      Target: 172.105.181.24
+      TargetAgent: '274'
+      TargetName: Sydney, Australia
+      Type: PING
+      Url: https://portal.our1.kentik.com/v4/synthetics/tests/5476/results/agent/300/274?start=1725361200
+      UrlLabel: Open Subtest Details
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: object
+    properties:
+      Description:
+        type: string
+      DetailedInfo:
+        type: array
+        items:
+          type: string
+      Labels:
+        type: array
+        items:
+          type: object
+          properties:
+            Name:
+              type: string
+            Value:
+              type: string
+            Color:
+              type: string
+            IsDark:
+              type: boolean
+            Type:
+              type: string
+      Origin:
+        type: string
+      Severity:
+        type: string
+      Status:
+        type: string
+      Target:
+        type: string
+      TargetAgent:
+        type: string
+      TargetName:
+        type: string
+      Type:
+        type: string
+      Url:
+        type: string
+        format: uri
+      UrlLabel:
+        type: string
+
+# To be added:
+# SynthType OriginAgentName OriginAgentId OriginAgentDetails
+# issues
+# statistics
+# TotalSubtestsCurrentlyCritical LatencySubtestsCurrentlyCritical TotalSubtestsCurrentlyWarning LatencySubtestsCurrentlyWarning TotalSubtestsCurrentlyHealthy JitterSubtestsCurrentlyHealthy PacketLossSubtestsCurrentlyHealth
+# RuleID
+
+- Name: SyntheticsTestURL
+  Tag: url
+  When: Synthetics Test health state change
+  Description: Hyperlink to the synthetic test
+  Examples:
+    - https://portal.kentik.com/v4/synthetics/tests/12345/results
+  Value:
+    $schema: https://json-schema.org/draft/2020-12/schema
+    type: string
+    format: uri

@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 var TestingViewModels = map[string]*NotificationViewModel{
 	"insight":    TestInsight,
@@ -226,7 +228,7 @@ var TestAlarm = &NotificationViewModel{
 			IsActive:       true,
 			StartTime:      "2021-11-17 10:29:32 UTC",
 			EndTime:        "ongoing",
-			CurrentState:   "alarm",
+			CurrentState:   "active",
 			PreviousState:  "new",
 			StartTimestamp: 1637144972,
 			EndTimestamp:   0,
@@ -249,6 +251,12 @@ var TestAlarm = &NotificationViewModel{
 					Name:  "AlarmPolicyName",
 					Label: "Source Policy Name",
 					Value: "UDP Fragments Attack",
+					Tag:   "",
+				},
+				&EventViewModelDetail{
+					Name:  "AlarmPolicyLabels",
+					Label: "Policy Labels",
+					Value: "foo, bar, baz",
 					Tag:   "",
 				},
 				&EventViewModelDetail{
@@ -381,7 +389,7 @@ var TestSynth = &NotificationViewModel{
 			Description:    "Synthetics Test My DNS Server Grid Critical",
 			IsActive:       true,
 			StartTime:      "2021-11-29 11:43:31 UTC",
-			CurrentState:   "alarm",
+			CurrentState:   "active",
 			PreviousState:  "new",
 			StartTimestamp: 1638186211,
 			Importance:     ViewModelImportance(7),
