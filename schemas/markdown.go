@@ -28,7 +28,7 @@ func htmlList(values []any) string {
 
 func IntoMarkdown(details []Detail) string {
 	builder := strings.Builder{}
-	builder.WriteString("| Name | Tag | When present | Description | Example values  | Value schema |\n")
+	builder.WriteString("| Name | Tag | When present | Description  | Value schema | Example values |\n")
 	builder.WriteString("| --- | --- | --- | --- | --- | --- |\n")
 
 	for _, detail := range details {

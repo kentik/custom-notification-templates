@@ -1,4 +1,4 @@
-| Name | Tag | When present | Description | Example values  | Value schema |
+| Name | Tag | When present | Description  | Value schema | Example values |
 | --- | --- | --- | --- | --- | --- |
 | AlarmID | _(empty)_ | Alerting alarm state changes | UUID v7 for the alarm | <pre>{<br>  "$schema": "https://json-schema.org/draft/2020-12/schema",<br>  "format": "uuid",<br>  "type": "string"<br>}</pre> | <ul><li><pre>"0190db1d-5d37-70a8-95bd-4092c918ecbe"</pre></li></ul> |
 | AlarmSeverity | _(empty)_ | Alerting alarm state changes | Alarm severity information | <pre>{<br>  "$schema": "https://json-schema.org/draft/2020-12/schema",<br>  "enum": [<br>    "clear",<br>    "minor",<br>    "major",<br>    "warning",<br>    "severe",<br>    "critical"<br>  ],<br>  "type": "string"<br>}</pre> | <ul><li><pre>"major"</pre></li><li><pre>"severe"</pre></li></ul> |
