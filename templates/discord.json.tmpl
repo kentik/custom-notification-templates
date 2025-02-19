@@ -40,11 +40,11 @@ Webhook execute parameters: https://discord.com/developers/docs/resources/webhoo
       {{- end -}}
 
 
-      {{- with $metrics := .Details.WithTag "metric" -}}
+      {{- with $metrics := .Details.PrettifiedMetrics -}}
         {{- if gt (len $metrics) 0 -}}
           **Metrics**:\n
           {{- range $index, $detail := $metrics -}}
-            - **{{ $detail.LabelOrName }}**: {{ $detail.Value }}\n
+            - **{{ $detail.Value }} {{ $detail.LabelOrName }}**\n
           {{- end -}}
         {{- end -}}
       {{- end -}}
