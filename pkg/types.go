@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
@@ -372,4 +373,71 @@ func (vm *NotificationViewModel) Summary() string {
 		segments = append(segments, fmt.Sprintf("%d changed to healthy", vm.InactiveCount()))
 	}
 	return strings.Join(segments, ", ")
+}
+
+// filter details to only ones with a metric tag and prettify their
+// values rounding the float values and converting bits to x-bits/s
+func (details EventViewModelDetails) PrettifiedMetrics() EventViewModelDetails {
+	result := make(EventViewModelDetails, 0)
+	for _, detail := range details {
+		if detail.Tag != "metric" {
+			continue
+		}
+
+		floatValue, err := toFloat(detail.Value)
+		if err != nil {
+			result = append(result, detail)
+			continue
+		}
+
+		label := detail.Label
+
+		// format bits with proper unit
+		if strings.HasPrefix(detail.Name, "bits") {
+			var prefix string
+			floatValue, prefix = formatBits(floatValue)
+			label = fmt.Sprintf("%sbits/s", prefix)
+		}
+
+		// prevent showing fractions when unnecessary
+		stringValue := fmt.Sprintf("%.2f", floatValue)
+		if _, fraction := math.Modf(floatValue); fraction < 0.05 {
+			stringValue = fmt.Sprintf("%.0f", floatValue)
+		}
+
+		formatted := &EventViewModelDetail{
+			Name:  detail.Name,
+			Label: label,
+			Tag:   detail.Tag,
+			Value: stringValue,
+		}
+
+		result = append(result, formatted)
+	}
+	return result
+}
+
+func toFloat(value interface{}) (float64, error) {
+	switch v := value.(type) {
+	case float64:
+		return v, nil
+	case int:
+		return float64(v), nil
+	default:
+		return 0, fmt.Errorf("don't know how to convert %T to float64", v)
+	}
+}
+
+func formatBits(bits float64) (float64, string) {
+	const unit = 1024
+	const suffixes = "KMGTPE"
+
+	exp := math.Floor(math.Log(bits) / math.Log(unit))
+	suffix := ""
+	if exp > 0 {
+		suffix = string(suffixes[int(exp)-1])
+	}
+	value := bits / math.Pow(unit, exp)
+
+	return value, suffix
 }

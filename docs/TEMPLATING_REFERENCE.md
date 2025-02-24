@@ -416,6 +416,49 @@ Example:
 }]
 ```
 
+For metrics there is a dedicated method `PrettifiedMetrics` which provided on the Details collection that returns only the details with `metric` tag with pre-formatted values:
+
+- returns them as string type rather than floating numbers;
+- rounds the floating values to 2 decimal digits or none if the fraction is below 0.05 delta
+- converts bit/s unit into the one the most applicable (Kbit/s, Mbit/s, Gbit/s etc.)
+
+**Example - Using PrettifiedMetrics**
+
+```go-template
+{{- if .IsSingleEvent  -}}
+  {{- with .Event -}}
+    {{- .Details.PrettifiedMetrics | toJSON -}}
+  {{- end -}}
+{{- end -}}
+}
+```
+
+For the previous example it would render as:
+
+```json
+[{
+  "Label": "Kbit/s",
+  "Name": "bits",
+  "Tag": "metric",
+  "Value": "46.25"
+},
+{
+  "Label": "Packets/second",
+  "Name": "packets",
+  "Tag": "metric",
+  "Value": "240.26"
+},
+{
+  "Label": "Unique Source IPs",
+  "Name": "unique_src_ip",
+  "Tag": "metric",
+  "Value": "1"
+}]
+```
+
+
+
+
 #### Labels
 
 Tags: `label`, `device_label`
