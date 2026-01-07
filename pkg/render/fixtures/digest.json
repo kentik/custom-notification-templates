@@ -1,0 +1,133 @@
+{
+    "CompanyID": 1001,
+    "CompanyName": "Kentik Test Company",
+    "Now": "2021-11-29T11:43:31Z",
+    "Config": {
+        "BaseDomain": "portal.kentik.com",
+        "EmailTo": [
+            "your@email.address"
+        ]
+    },
+    "Events": [
+        {
+            "Type": "insight",
+            "Description": "Insight for Total Traffic Today",
+            "IsActive": true,
+            "StartTime": "2021-11-11 18:33:53 UTC",
+            "EndTime": "2021-11-11 18:33:53 UTC",
+            "CurrentState": "n/a",
+            "PreviousState": "n/a",
+            "StartTimestamp": 1636655633,
+            "EndTimestamp": 1636655633,
+            "Importance": 4,
+            "GroupName": "Total Traffic Today",
+            "Details": [
+                {
+                    "Name": "InsightName",
+                    "Label": "System Name",
+                    "Value": "interconnection.costs.bpsDayOverDay",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightID",
+                    "Label": "ID",
+                    "Value": "k123456",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightDataSourceType",
+                    "Label": "Source",
+                    "Value": "ksql",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightPlainDescription",
+                    "Label": "Description",
+                    "Value": "You sent and received 26% more traffic (+155 Gbits/s) this week compared to last week.",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightDetailsURL",
+                    "Label": "Open Details",
+                    "Value": "https://portal.kentik.com/v4/operate/insights/k123456",
+                    "Tag": "url"
+                },
+                {
+                    "Name": "InsightsMainURL",
+                    "Label": "Open Insights Dashboard",
+                    "Value": "https://portal.kentik.com/v4/operate/insights",
+                    "Tag": "url"
+                }
+            ]
+        },
+        {
+            "Type": "insight",
+            "Description": "Insight for Total Traffic Today",
+            "IsActive": true,
+            "StartTime": "2021-11-11 18:33:53 UTC",
+            "EndTime": "2021-11-11 18:33:53 UTC",
+            "CurrentState": "n/a",
+            "PreviousState": "n/a",
+            "StartTimestamp": 1636655633,
+            "EndTimestamp": 1636655633,
+            "Importance": 4,
+            "GroupName": "Total Traffic Today",
+            "Details": [
+                {
+                    "Name": "InsightName",
+                    "Label": "System Name",
+                    "Value": "custom.insight.UDP Fragments Attack",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightID",
+                    "Label": "ID",
+                    "Value": "a197790252",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightDataSourceType",
+                    "Label": "Source",
+                    "Value": "alerting",
+                    "Tag": ""
+                },
+                {
+                    "Name": "InsightPlainDescription",
+                    "Label": "Description",
+                    "Value": "An alarm was triggered for Dest IP/CIDR: 209.50.158.100",
+                    "Tag": ""
+                },
+                {
+                    "Name": "bits",
+                    "Label": "",
+                    "Value": 58555.9140625,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "packets",
+                    "Label": "",
+                    "Value": 11.200035095214844,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "unique_src_ip",
+                    "Label": "",
+                    "Value": 1,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "InsightDetailsURL",
+                    "Label": "Open Details",
+                    "Value": "https://portal.kentik.com/v4/operate/insights/a197790252",
+                    "Tag": "url"
+                },
+                {
+                    "Name": "InsightsMainURL",
+                    "Label": "Open Insights Dashboard",
+                    "Value": "https://portal.kentik.com/v4/operate/insights",
+                    "Tag": "url"
+                }
+            ]
+        }
+    ]
+}

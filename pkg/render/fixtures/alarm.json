@@ -1,0 +1,172 @@
+{
+    "CompanyID": 1002,
+    "CompanyName": "ACME Incorporated",
+    "Now": "2021-11-29T11:43:31Z",
+    "Config": {
+        "BaseDomain": "portal.kentik.com",
+        "EmailTo": [
+            "your@email.address"
+        ]
+    },
+    "Events": [
+        {
+            "Type": "alarm",
+            "Description": "Alarm for UDP Fragments Attack Active",
+            "IsActive": true,
+            "StartTime": "2021-11-17 10:29:32 UTC",
+            "EndTime": "ongoing",
+            "CurrentState": "active",
+            "PreviousState": "new",
+            "StartTimestamp": 1637144972,
+            "EndTimestamp": 0,
+            "Importance": 5,
+            "GroupName": "Alarm for UDP Fragments Attack",
+            "Details": [
+                {
+                    "Name": "AlarmID",
+                    "Label": "ID",
+                    "Value": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmSeverity",
+                    "Label": "Severity",
+                    "Value": "major",
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmPolicyName",
+                    "Label": "Source Policy Name",
+                    "Value": "UDP Fragments Attack",
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmPolicyLabels",
+                    "Label": "Policy Labels",
+                    "Value": "foo, bar, baz",
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmPolicyID",
+                    "Label": "Policy ID",
+                    "Value": 432,
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmThresholdID",
+                    "Label": "Threshold ID",
+                    "Value": 14444,
+                    "Tag": ""
+                },
+                {
+                    "Name": "Baseline",
+                    "Label": "Baseline Value",
+                    "Value": 777.654,
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmBaselineSource",
+                    "Label": "Baseline Source",
+                    "Value": "ACT_BASELINE_MISSING_DEFAULT_INSTEAD_OF_LOWEST",
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmBaselineDescription",
+                    "Label": "Baseline Source Info",
+                    "Value": "No baseline value was found for this key and this key's current value exceeded the default value and there were no other (lowest) values in the baseline available.",
+                    "Tag": ""
+                },
+                {
+                    "Name": "IP_dst",
+                    "Label": "Dest IP/CIDR",
+                    "Value": "209.50.158.100",
+                    "Tag": "dimension"
+                },
+                {
+                    "Name": "i_device_id",
+                    "Label": "Device ID",
+                    "Value": 1234,
+                    "Tag": "dimension"
+                },
+                {
+                    "Name": "DeviceId",
+                    "Label": "Device ID",
+                    "Value": 12345,
+                    "Tag": "device"
+                },
+                {
+                    "Name": "bits",
+                    "Label": "",
+                    "Value": 58555.9140625,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "packets",
+                    "Label": "",
+                    "Value": 11.200035095214844,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "unique_src_ip",
+                    "Label": "",
+                    "Value": 1,
+                    "Tag": "metric"
+                },
+                {
+                    "Name": "DeviceName",
+                    "Label": "Device",
+                    "Value": "MyGreatRouter",
+                    "Tag": "device"
+                },
+                {
+                    "Name": "DeviceType",
+                    "Label": "Device Type",
+                    "Value": "router",
+                    "Tag": "device"
+                },
+                {
+                    "Name": "DeviceLabels",
+                    "Label": "Device Labels",
+                    "Value": "ACME1, ACME2",
+                    "Tag": "device_labels"
+                },
+                {
+                    "Name": "DeviceLabel1",
+                    "Value": {
+                        "Name": "ACME1",
+                        "Color": "#ff0000",
+                        "IsDark": true
+                    },
+                    "Tag": "device_label"
+                },
+                {
+                    "Name": "TestLabel2",
+                    "Value": {
+                        "Name": "ACME2",
+                        "Color": "#ffff00",
+                        "IsDark": true
+                    },
+                    "Tag": "device_label"
+                },
+                {
+                    "Name": "DashboardAlarmURL",
+                    "Label": "Open in Dashboard",
+                    "Value": "https://portal.kentik.com/v4/library/dashboards/49",
+                    "Tag": "url"
+                },
+                {
+                    "Name": "InsightAlarmURL",
+                    "Label": "Open Insight",
+                    "Value": "https://portal.kentik.com/v4/core/insights/a197790252",
+                    "Tag": "url"
+                },
+                {
+                    "Name": "AttackLogURL",
+                    "Label": "Open Log",
+                    "Value": "https://portal.kentik.com/v4/protect/ddos/analyze/log/197790252",
+                    "Tag": "url"
+                }
+            ]
+        }
+    ]
+}
