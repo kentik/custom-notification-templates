@@ -30,17 +30,6 @@ const (
 	ViewModelImportance_Critical ViewModelImportance = 7
 )
 
-var VieModelImportanceOrdered = [...]ViewModelImportance{
-	ViewModelImportance_Critical,
-	ViewModelImportance_Severe,
-	ViewModelImportance_Major,
-	ViewModelImportance_Warning,
-	ViewModelImportance_Minor,
-	ViewModelImportance_Notice,
-	ViewModelImportance_Healthy,
-	ViewModelImportance_None,
-}
-
 var ImportanceNames = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "n/a",
 	ViewModelImportance_Healthy:  "healthy",
@@ -65,13 +54,13 @@ var ImportanceToColors = map[ViewModelImportance]string{
 
 var ImportanceToEmojis = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "",
-	ViewModelImportance_Healthy:  ":warning:",
-	ViewModelImportance_Notice:   ":warning:",
-	ViewModelImportance_Minor:    ":warning:",
-	ViewModelImportance_Warning:  ":warning:",
-	ViewModelImportance_Major:    ":warning:",
-	ViewModelImportance_Severe:   ":warning:",
-	ViewModelImportance_Critical: ":warning:",
+	ViewModelImportance_Healthy:  ":warning: :large_green_circle:",
+	ViewModelImportance_Notice:   ":warning: :large_blue_circle:",
+	ViewModelImportance_Minor:    ":warning: :large_purple_circle:",
+	ViewModelImportance_Warning:  ":warning: :large_brown_circle:",
+	ViewModelImportance_Major:    ":warning: :large_yellow_circle:",
+	ViewModelImportance_Severe:   ":warning: :large_orange_circle: ",
+	ViewModelImportance_Critical: ":warning: :red_circle:",
 }
 
 type EventViewModel struct {
