@@ -82,7 +82,30 @@ func renderTemplate(this js.Value, args []js.Value) (result any) {
 	}
 }
 
+// returns the complete schema for template editing, with available fields
+func getSchema(this js.Value, args []js.Value) (result any) {
+	defer func() {
+		if r := recover(); r != nil {
+			errMap := map[string]string{"error": fmt.Sprintf("Unexpected error: %v", r)}
+			b, _ := json.Marshal(errMap)
+			result = string(b)
+		}
+	}()
+
+	schema := render.GetSchema()
+
+	b, err := json.Marshal(schema)
+	if err != nil {
+		errMap := map[string]string{"error": fmt.Sprintf("Failed to marshal schema: %v", err)}
+		b, _ := json.Marshal(errMap)
+		return string(b)
+	}
+
+	return string(b)
+}
+
 func main() {
 	js.Global().Set("goTemplateRender", js.FuncOf(renderTemplate))
+	js.Global().Set("goTemplateGetSchema", js.FuncOf(getSchema))
 	select {}
 }
