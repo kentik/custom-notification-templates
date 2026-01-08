@@ -64,18 +64,18 @@ var ImportanceToEmojis = map[ViewModelImportance]string{
 }
 
 type EventViewModel struct {
-	Type           string
-	Description    string `json:",omitempty"`
-	IsActive       bool
-	StartTime      string
-	EndTime        string
-	CurrentState   string
-	PreviousState  string
-	StartTimestamp int64                 `json:"-"`
-	EndTimestamp   int64                 `json:"-"`
-	Importance     ViewModelImportance   `json:"-"`
-	GroupName      string                `json:"-"`
-	Details        EventViewModelDetails `json:"-"`
+	Type           string                `description:"Event type (alarm, insight, synthetic, mitigation, generic)"`
+	Description    string                `json:",omitempty" description:"Human-readable event description"`
+	IsActive       bool                  `description:"Whether the event is currently active"`
+	StartTime      string                `description:"Formatted start time string"`
+	EndTime        string                `description:"Formatted end time string"`
+	CurrentState   string                `description:"Current state of the event"`
+	PreviousState  string                `description:"Previous state of the event"`
+	StartTimestamp int64                 `json:"-" description:"Unix timestamp of event start"`
+	EndTimestamp   int64                 `json:"-" description:"Unix timestamp of event end"`
+	Importance     ViewModelImportance   `json:"-" description:"Severity level (0-7)"`
+	GroupName      string                `json:"-" description:"Name of the event group"`
+	Details        EventViewModelDetails `json:"-" description:"List of event detail key-value pairs"`
 }
 
 func (e *EventViewModel) UnmarshalJSON(data []byte) error {
@@ -123,10 +123,10 @@ func (event EventViewModel) IsSynthetic() bool {
 }
 
 type EventViewModelDetail struct {
-	Name  string
-	Label string `json:",omitempty"`
-	Value interface{}
-	Tag   string `json:"-"`
+	Name  string      `description:"Detail field name/key"`
+	Label string      `json:",omitempty" description:"Human-readable label for the detail"`
+	Value interface{} `description:"Detail value (can be any type)"`
+	Tag   string      `json:"-" description:"Categorization tag (metric, dimension, url, device, etc.)"`
 }
 
 func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
@@ -252,13 +252,11 @@ func (detail EventViewModelDetail) LabelOrName() string {
 }
 
 type NotificationViewModel struct {
-	CompanyID   int
-	CompanyName string    `json:"-"`
-	Now         time.Time `json:"-"`
-
-	RawEvents []*EventViewModel `json:"-"`
-
-	Config *NotificationViewConfig `json:"-"`
+	CompanyID   int                      `description:"Unique identifier for the company"`
+	CompanyName string                   `json:"-" description:"Name of the company"`
+	Now         time.Time                `json:"-" description:"Current timestamp when notification is generated"`
+	RawEvents   []*EventViewModel        `json:"-" description:"List of all events in this notification"`
+	Config      *NotificationViewConfig  `json:"-" description:"Notification configuration settings"`
 }
 
 func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
@@ -284,8 +282,8 @@ func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
 }
 
 type NotificationViewConfig struct {
-	BaseDomain string
-	EmailTo    []string
+	BaseDomain string   `description:"Portal base domain (e.g., portal.kentik.com)"`
+	EmailTo    []string `description:"List of email recipients"`
 }
 
 func (vm *NotificationViewModel) BasePortalURL() string {

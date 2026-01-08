@@ -76,7 +76,7 @@ func extractTypeFields(t reflect.Type, path string) []*SchemaField {
 		sf := &SchemaField{
 			Name:        field.Name,
 			Path:        path,
-			Description: getFieldDescription(field.Name),
+			Description: field.Tag.Get("description"),
 		}
 
 		fieldType := field.Type
@@ -216,44 +216,6 @@ func getTypeName(t reflect.Type) string {
 	}
 }
 
-func getFieldDescription(name string) string {
-	descriptions := map[string]string{
-		"CompanyID":   "Unique identifier for the company",
-		"CompanyName": "Name of the company",
-		"Now":         "Current timestamp when notification is generated",
-		"RawEvents":   "List of all events in this notification",
-		"Config":      "Notification configuration settings",
-
-		// EventViewModel fields
-		"Type":           "Event type (alarm, insight, synthetic, mitigation, generic)",
-		"Description":    "Human-readable event description",
-		"IsActive":       "Whether the event is currently active",
-		"StartTime":      "Formatted start time string",
-		"EndTime":        "Formatted end time string",
-		"CurrentState":   "Current state of the event",
-		"PreviousState":  "Previous state of the event",
-		"StartTimestamp": "Unix timestamp of event start",
-		"EndTimestamp":   "Unix timestamp of event end",
-		"Importance":     "Severity level (0-7)",
-		"GroupName":      "Name of the event group",
-		"Details":        "List of event detail key-value pairs",
-
-		// EventViewModelDetail fields
-		"Name":  "Detail field name/key",
-		"Label": "Human-readable label for the detail",
-		"Value": "Detail value (can be any type)",
-		"Tag":   "Categorization tag (metric, dimension, url, device, etc.)",
-
-		// NotificationViewConfig fields
-		"BaseDomain": "Portal base domain (e.g., portal.kentik.com)",
-		"EmailTo":    "List of email recipients",
-	}
-
-	if desc, ok := descriptions[name]; ok {
-		return desc
-	}
-	return ""
-}
 
 func getMethodDescription(typeName, methodName string) string {
 	key := typeName + "." + methodName
