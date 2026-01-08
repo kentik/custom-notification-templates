@@ -1,14 +1,12 @@
-package main
+package render
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 	"testing"
-	"text/template"
 )
 
 type TemplateEntry struct {
@@ -20,7 +18,7 @@ type TemplateEntry struct {
 func templateFiles(location string) ([]TemplateEntry, error) {
 	var result []TemplateEntry
 
-	entries, err := ioutil.ReadDir(location)
+	entries, err := os.ReadDir(location)
 	if err != nil {
 		return nil, fmt.Errorf("Error reading directory: %s", err)
 	}
@@ -37,34 +35,36 @@ func templateFiles(location string) ([]TemplateEntry, error) {
 }
 
 func Test_AllExamples_Render(t *testing.T) {
-	entries, err := templateFiles("../templates")
+	entries, err := templateFiles("../../templates")
 	if err != nil {
 		t.Fatalf("Error reading directory: %s", err)
 	}
+	t.Logf("Found %d template files", len(entries))
 	for _, entry := range entries {
-		templateContent, err := ioutil.ReadFile(entry.Path)
+		t.Logf("Testing template file %s", entry.Path)
+		templateContent, err := os.ReadFile(entry.Path)
 		if err != nil {
 			t.Fatalf("Error reading template file %s: %s", entry.Name, err)
 		}
-		parsed, err := template.New(entry.Name).Funcs(TextTemplateFuncMap).Parse(string(templateContent))
-		if err != nil {
-			t.Fatalf("Error parsing the template from %s: %s", entry.Name, err)
-		}
 
 		for modelName, model := range TestingViewModels {
-			var buf bytes.Buffer
-			err := parsed.Execute(&buf, model)
-			if err != nil {
-				t.Fatalf("Error rendering %s using %s: %s", modelName, entry.Name, err)
+			req := RenderRequest{
+				Template: string(templateContent),
+				Data:     model,
+			}
+			resp := Render(req)
+			if resp.Error != "" {
+				t.Fatalf("Error rendering %s using %s: %s", modelName, entry.Name, resp.Error)
 			}
 
-			result := buf.Bytes()
-			outputPath := fmt.Sprintf("../output/%s-%s", modelName, strings.TrimSuffix(entry.Name, ".tmpl"))
-			ioutil.WriteFile(outputPath, result, 0644)
+			result := resp.Output
+			outputPath := fmt.Sprintf("../../output/%s-%s", modelName, strings.TrimSuffix(entry.Name, ".tmpl"))
+			os.WriteFile(outputPath, []byte(result), 0644)
+			t.Logf("Wrote output to %s", outputPath)
 
 			if entry.IsJson {
 				var jsonValue interface{}
-				err := json.Unmarshal(result, &jsonValue)
+				err := json.Unmarshal([]byte(result), &jsonValue)
 				if err != nil {
 					t.Fatalf("JSON error when rendering %s using %s: %s. Payload: %s", modelName, entry.Name, err, string(result))
 				}

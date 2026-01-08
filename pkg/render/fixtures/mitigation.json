@@ -1,0 +1,105 @@
+{
+    "CompanyID": 1001,
+    "CompanyName": "ACME Incorporated",
+    "Now": "2021-11-29T11:43:31Z",
+    "Config": {
+        "BaseDomain": "portal.kentik.com",
+        "EmailTo": [
+            "your@email.address"
+        ]
+    },
+    "Events": [
+        {
+            "Type": "mitigation",
+            "Description": "Mitigation for Policy UDP Fragments Attack Clear",
+            "IsActive": false,
+            "StartTime": "2020-12-18 20:49:51 UTC",
+            "EndTime": "2020-12-18 22:01:23 UTC",
+            "CurrentState": "archived",
+            "PreviousState": "ackRequired",
+            "StartTimestamp": 1608324591,
+            "EndTimestamp": 1608328883,
+            "Importance": 1,
+            "GroupName": "Mitigation for Policy UDP Fragments Attack",
+            "Details": [
+                {
+                    "Name": "MitigationID",
+                    "Label": "ID",
+                    "Value": 12345,
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationPolicyID",
+                    "Label": "Policy ID",
+                    "Value": 7890,
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationPolicyName",
+                    "Label": "Policy Name",
+                    "Value": "UDP Fragments Attack",
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationPlatformID",
+                    "Label": "Platform ID",
+                    "Value": 1747,
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationPlatformName",
+                    "Label": "Platform Name",
+                    "Value": "My Mitigation Platform"
+                },
+                {
+                    "Name": "MitigationMethodID",
+                    "Label": "Method ID",
+                    "Value": 775,
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationMethodName",
+                    "Label": "Method Name",
+                    "Value": "My Mitigation Method",
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationAlarmID",
+                    "Label": "Alarm ID",
+                    "Value": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationAlertIp",
+                    "Label": "IP/CIDR Address",
+                    "Value": "92.204.191.35/32",
+                    "Tag": ""
+                },
+                {
+                    "Name": "LastMitigationEvent",
+                    "Label": "",
+                    "Value": "skipWait",
+                    "Tag": ""
+                },
+                {
+                    "Name": "IP_dst",
+                    "Label": "",
+                    "Value": "209.50.158.100",
+                    "Tag": "dimension"
+                },
+                {
+                    "Name": "AlarmSeverity",
+                    "Label": "",
+                    "Value": "major",
+                    "Tag": ""
+                },
+                {
+                    "Name": "MitigationURL",
+                    "Label": "Open Mitigation Details",
+                    "Value": "https://portal.kentik.com/v4/protect/mitigations/12345",
+                    "Tag": "url"
+                }
+            ]
+        }
+    ]
+}

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kentik/custom-notification-templates/schemas"
+	"github.com/kentik/custom-notification-templates/pkg/schemas"
 )
 
 func main() {

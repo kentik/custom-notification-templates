@@ -1,0 +1,150 @@
+{
+    "CompanyID": 1003,
+    "CompanyName": "ACME Incorporated",
+    "Now": "2021-11-29T11:43:31Z",
+    "Config": {
+        "BaseDomain": "portal.kentik.com",
+        "EmailTo": [
+            "your@email.address"
+        ]
+    },
+    "Events": [
+        {
+            "Type": "synthetic",
+            "Description": "Synthetics Test My DNS Server Grid Critical",
+            "IsActive": true,
+            "StartTime": "2021-11-29 11:43:31 UTC",
+            "CurrentState": "active",
+            "PreviousState": "new",
+            "StartTimestamp": 1638186211,
+            "Importance": 7,
+            "GroupName": "Synthetics Test My DNS Server Grid",
+            "Details": [
+                {
+                    "Name": "Health",
+                    "Label": "",
+                    "Value": "Unhealthy",
+                    "Tag": ""
+                },
+                {
+                    "Name": "TestID",
+                    "Label": "",
+                    "Value": 1228,
+                    "Tag": ""
+                },
+                {
+                    "Name": "AlarmID",
+                    "Label": "",
+                    "Value": "0190db1d-5d37-70a8-95bd-4092c918ecbe",
+                    "Tag": ""
+                },
+                {
+                    "Name": "TestName",
+                    "Label": "Test Name",
+                    "Value": "My DNS Server Grid",
+                    "Tag": ""
+                },
+                {
+                    "Name": "TestType",
+                    "Label": "Test Type",
+                    "Value": "dns-grid",
+                    "Tag": ""
+                },
+                {
+                    "Name": "Issue1",
+                    "Label": "Issue #1",
+                    "Value": {
+                        "Description": "foo.kentik.com: PING ⇒ 208.76.14.180 went critical from healthy",
+                        "Labels": [
+                            {
+                                "Name": "MyAgentLabel",
+                                "Color": "#ff0000",
+                                "IsDark": true
+                            },
+                            {
+                                "Name": "OtherLabel",
+                                "Color": "#ffff00",
+                                "IsDark": true
+                            }
+                        ],
+                        "Origin": "foo.kentik.com",
+                        "Status": "critical",
+                        "Type": "PING",
+                        "Target": "208.76.14.180",
+                        "DetailedInfo": [
+                            "Packet loss: 40.00% (critical)",
+                            "Latency: 0.08ms (warning)",
+                            "Jitter: 0.01ms (healthy)"
+                        ],
+                        "Severity": "critical",
+                        "Url": "http://portal.kentik.com/v4/synthetics/tests/1234/results/agent/266?start=1655472388",
+                        "UrlLabel": "Open Task Details"
+                    },
+                    "Tag": "issue"
+                },
+                {
+                    "Name": "Issue2",
+                    "Label": "Issue #2",
+                    "Value": {
+                        "Description": "bar.kentik.com: PING ⇒ 208.76.14.180 went warning from healthy",
+                        "Origin": "bar.kentik.com",
+                        "Status": "warning",
+                        "Type": "PING",
+                        "Target": "208.76.14.180",
+                        "DetailedInfo": [
+                            "Packet loss: 20.00% (warning)",
+                            "Latency: 0.08ms (warning)",
+                            "Jitter: 0.01ms (healthy)"
+                        ],
+                        "Severity": "warning",
+                        "Url": "http://portal.kentik.com/v4/synthetics/tests/1234/results/agent/265?start=1655472388",
+                        "UrlLabel": "Open Task Details"
+                    },
+                    "Tag": "issue"
+                },
+                {
+                    "Name": "TestLabel1",
+                    "Value": {
+                        "Name": "Foo: MyTestLabel",
+                        "Color": "#00ffffff",
+                        "IsDark": false
+                    },
+                    "Tag": "label"
+                },
+                {
+                    "Name": "TestLabel2",
+                    "Value": {
+                        "Name": "OtherLabel",
+                        "Color": "#ffff00",
+                        "IsDark": true
+                    },
+                    "Tag": "label"
+                },
+                {
+                    "Name": "TotalSubtestsCurrentlyWarning",
+                    "Label": "Total sub-tests warning",
+                    "Value": 1,
+                    "Tag": "statistic"
+                },
+                {
+                    "Name": "TotalSubtestsCurrentlyCritical",
+                    "Label": "Total sub-tests critical",
+                    "Value": 1,
+                    "Tag": "statistic"
+                },
+                {
+                    "Name": "TotalSubtestsCurrentlyHealthy",
+                    "Label": "Total sub-tests healthy",
+                    "Value": 7,
+                    "Tag": "statistic"
+                },
+                {
+                    "Name": "SyntheticsTestURL",
+                    "Label": "Open Test Details",
+                    "Value": "https://portal.kentik.com/v4/synthetics/tests/1234/results?start=1638186211&end=1638186211",
+                    "Tag": "url"
+                }
+            ]
+        }
+    ]
+}

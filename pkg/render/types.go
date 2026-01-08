@@ -1,46 +1,34 @@
-package main
+package render
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"strings"
 	"time"
 )
 
-type EventType string
-
 const (
 	EventType_Alarm         string = "alarm"
-	EventType_Insight              = "insight"
-	EventType_CustomInsight        = "custom-insight"
-	EventType_Synthetics           = "synthetic"
-	EventType_Mitigation           = "mitigation"
-	EventType_Generic              = "generic"
+	EventType_Insight       string = "insight"
+	EventType_CustomInsight string = "custom-insight"
+	EventType_Synthetics    string = "synthetic"
+	EventType_Mitigation    string = "mitigation"
+	EventType_Generic       string = "generic"
 )
 
 type ViewModelImportance int32
 
 const (
 	ViewModelImportance_None     ViewModelImportance = 0
-	ViewModelImportance_Healthy                      = 1
-	ViewModelImportance_Notice                       = 2
-	ViewModelImportance_Minor                        = 3
-	ViewModelImportance_Warning                      = 4
-	ViewModelImportance_Major                        = 5
-	ViewModelImportance_Severe                       = 6
-	ViewModelImportance_Critical                     = 7
+	ViewModelImportance_Healthy  ViewModelImportance = 1
+	ViewModelImportance_Notice   ViewModelImportance = 2
+	ViewModelImportance_Minor    ViewModelImportance = 3
+	ViewModelImportance_Warning  ViewModelImportance = 4
+	ViewModelImportance_Major    ViewModelImportance = 5
+	ViewModelImportance_Severe   ViewModelImportance = 6
+	ViewModelImportance_Critical ViewModelImportance = 7
 )
-
-var VieModelImportanceOrdered = [...]ViewModelImportance{
-	ViewModelImportance_Critical,
-	ViewModelImportance_Severe,
-	ViewModelImportance_Major,
-	ViewModelImportance_Warning,
-	ViewModelImportance_Minor,
-	ViewModelImportance_Notice,
-	ViewModelImportance_Healthy,
-	ViewModelImportance_None,
-}
 
 var ImportanceNames = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "n/a",
@@ -66,30 +54,52 @@ var ImportanceToColors = map[ViewModelImportance]string{
 
 var ImportanceToEmojis = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "",
-	ViewModelImportance_Healthy:  ":warning:",
-	ViewModelImportance_Notice:   ":warning:",
-	ViewModelImportance_Minor:    ":warning:",
-	ViewModelImportance_Warning:  ":warning:",
-	ViewModelImportance_Major:    ":warning:",
-	ViewModelImportance_Severe:   ":warning:",
-	ViewModelImportance_Critical: ":warning:",
+	ViewModelImportance_Healthy:  ":warning: :large_green_circle:",
+	ViewModelImportance_Notice:   ":warning: :large_blue_circle:",
+	ViewModelImportance_Minor:    ":warning: :large_purple_circle:",
+	ViewModelImportance_Warning:  ":warning: :large_brown_circle:",
+	ViewModelImportance_Major:    ":warning: :large_yellow_circle:",
+	ViewModelImportance_Severe:   ":warning: :large_orange_circle: ",
+	ViewModelImportance_Critical: ":warning: :red_circle:",
 }
 
-// use "export" key instead of standard json key when marshalling/unmarshalling using jsoniter (https://github.com/json-iterator/go),
-// so fields are not removed per standard json tag
 type EventViewModel struct {
 	Type           string
-	Description    string `json:",omitempty" export:"Description"`
+	Description    string `json:",omitempty"`
 	IsActive       bool
 	StartTime      string
 	EndTime        string
 	CurrentState   string
 	PreviousState  string
-	StartTimestamp int64                 `json:"-" export:"StartTimestamp"`
-	EndTimestamp   int64                 `json:"-" export:"EndTimestamp"`
-	Importance     ViewModelImportance   `json:"-" export:"Importance"`
-	GroupName      string                `json:"-" export:"GroupName"`
-	Details        EventViewModelDetails `json:"-" export:"Details"`
+	StartTimestamp int64                 `json:"-"`
+	EndTimestamp   int64                 `json:"-"`
+	Importance     ViewModelImportance   `json:"-"`
+	GroupName      string                `json:"-"`
+	Details        EventViewModelDetails `json:"-"`
+}
+
+func (e *EventViewModel) UnmarshalJSON(data []byte) error {
+	type EvmAsInput EventViewModel
+	aux := &struct {
+		StartTimestamp int64                 `json:"StartTimestamp"`
+		EndTimestamp   int64                 `json:"EndTimestamp"`
+		Importance     ViewModelImportance   `json:"Importance"`
+		GroupName      string                `json:"GroupName"`
+		Details        EventViewModelDetails `json:"Details"`
+		*EvmAsInput
+	}{
+		EvmAsInput: (*EvmAsInput)(e),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	e.StartTimestamp = aux.StartTimestamp
+	e.EndTimestamp = aux.EndTimestamp
+	e.Importance = aux.Importance
+	e.GroupName = aux.GroupName
+	e.Details = aux.Details
+	return nil
 }
 
 func (event EventViewModel) IsAlarm() bool {
@@ -116,7 +126,22 @@ type EventViewModelDetail struct {
 	Name  string
 	Label string `json:",omitempty"`
 	Value interface{}
-	Tag   string `json:"-" export:"Tag"`
+	Tag   string `json:"-"`
+}
+
+func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
+	type EvmDetailAsInput EventViewModelDetail
+	aux := &struct {
+		Tag string `json:"Tag"`
+		*EvmDetailAsInput
+	}{
+		EvmDetailAsInput: (*EvmDetailAsInput)(d),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	d.Tag = aux.Tag
+	return nil
 }
 
 type EventViewModelDetails []*EventViewModelDetail
@@ -228,13 +253,36 @@ func (detail EventViewModelDetail) LabelOrName() string {
 
 type NotificationViewModel struct {
 	CompanyID   int
-	CompanyName string    `json:"-" export:"CompanyName"`
-	Now         time.Time `json:"-" export:"Now"`
+	CompanyName string    `json:"-"`
+	Now         time.Time `json:"-"`
 
-	RawEvents []*EventViewModel `json:"-" export:"RawEvents"`
+	RawEvents []*EventViewModel `json:"-"`
 
-	Config *NotificationViewConfig `json:"-" export:"Config"`
+	Config *NotificationViewConfig `json:"-"`
 }
+
+func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
+	type NvmAsInput NotificationViewModel
+	aux := &struct {
+		CompanyName string                  `json:"CompanyName"`
+		Now         time.Time               `json:"Now"`
+		RawEvents   []*EventViewModel       `json:"Events"`
+		Config      *NotificationViewConfig `json:"Config"`
+		*NvmAsInput
+	}{
+		NvmAsInput: (*NvmAsInput)(vm),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	vm.CompanyName = aux.CompanyName
+	vm.Now = aux.Now
+	vm.RawEvents = aux.RawEvents
+	vm.Config = aux.Config
+	return nil
+}
+
 type NotificationViewConfig struct {
 	BaseDomain string
 	EmailTo    []string
@@ -285,6 +333,9 @@ func (vm *NotificationViewModel) IsAtLeastOneEvent() bool {
 }
 
 func (vm *NotificationViewModel) Event() *EventViewModel {
+	if len(vm.RawEvents) == 0 {
+		return nil
+	}
 	return vm.RawEvents[0]
 }
 
