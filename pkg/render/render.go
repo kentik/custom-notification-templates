@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var lineColumnRegex = regexp.MustCompile(`template:\s*\S+:(\d+)(?::(\d+))?`)
+var lineColumnRegex = regexp.MustCompile(`template:\s*[^:]+:(\d+)(?::(\d+))?`)
 
 type RenderRequest struct {
 	Name     string          `json:"name"`

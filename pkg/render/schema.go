@@ -96,16 +96,27 @@ func extractTypeFields(t reflect.Type, path string) []*SchemaField {
 			sf.ElementType = elemType.Name()
 			sf.Type = "[]" + elemType.Name()
 
+			// Build collection path (without [])
+			collectionPath := path
+			if collectionPath == "." {
+				collectionPath = "." + field.Name
+			} else {
+				collectionPath = collectionPath + "." + field.Name
+			}
+
+			// Extract methods on the collection type itself (e.g., EventViewModelDetails methods)
+			// Use the original field type which may be a named slice type with methods
+			originalFieldType := field.Type
+			if originalFieldType.Kind() == reflect.Ptr {
+				originalFieldType = originalFieldType.Elem()
+			}
+			sf.Children = extractTypeMethods(reflect.PtrTo(originalFieldType), collectionPath)
+
 			// Extract children for struct element types
 			if elemType.Kind() == reflect.Struct && !isBasicType(elemType) {
-				childPath := path
-				if childPath == "." {
-					childPath = "." + field.Name + "[]"
-				} else {
-					childPath = childPath + "." + field.Name + "[]"
-				}
-				sf.Children = extractTypeFields(elemType, childPath)
-				sf.Children = append(sf.Children, extractTypeMethods(reflect.PtrTo(elemType), childPath)...)
+				elemPath := collectionPath + "[]"
+				sf.Children = append(sf.Children, extractTypeFields(elemType, elemPath)...)
+				sf.Children = append(sf.Children, extractTypeMethods(reflect.PtrTo(elemType), elemPath)...)
 			}
 		} else if fieldType.Kind() == reflect.Struct && !isBasicType(fieldType) {
 			sf.Type = fieldType.Name()
@@ -158,12 +169,36 @@ func extractTypeMethods(t reflect.Type, path string) []*SchemaField {
 		}
 
 		// Build return type
+		var returnType reflect.Type
 		if numOut == 1 {
-			sf.ReturnType = getTypeName(methodType.Out(0))
+			returnType = methodType.Out(0)
+			sf.ReturnType = getTypeName(returnType)
 			sf.Type = sf.ReturnType
 		} else if numOut == 2 {
-			sf.ReturnType = getTypeName(methodType.Out(0))
+			returnType = methodType.Out(0)
+			sf.ReturnType = getTypeName(returnType)
 			sf.Type = sf.ReturnType
+		}
+
+		// Expand struct return types to include their children
+		// This allows traversing method chains like .Event.Details.HasTag
+		if returnType != nil {
+			// Dereference pointer return types
+			if returnType.Kind() == reflect.Ptr {
+				returnType = returnType.Elem()
+			}
+
+			// For struct return types, include their fields and methods as children
+			if returnType.Kind() == reflect.Struct && !isBasicType(returnType) {
+				childPath := path
+				if childPath == "." {
+					childPath = "." + method.Name
+				} else {
+					childPath = childPath + "." + method.Name
+				}
+				sf.Children = extractTypeFields(returnType, childPath)
+				sf.Children = append(sf.Children, extractTypeMethods(reflect.PtrTo(returnType), childPath)...)
+			}
 		}
 
 		result = append(result, sf)
