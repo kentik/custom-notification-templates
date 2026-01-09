@@ -18,10 +18,10 @@ docs:
 test: test-go test-wasm
 
 test-go:
-	go test ./pkg/...
+	go test ./...
 
 test-wasm: wasm
-	node node_wasm_test.js
+	node ./wasm_support/integration_tests.js
 
 dist:
 	mkdir -p $(DIST_DIR)
