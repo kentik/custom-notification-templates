@@ -28,4 +28,4 @@ dist:
 
 wasm: dist
 	GOOS=js GOARCH=wasm $(GO) build -o $(WASM_OUT) ./cmd/wasm
-	cp "$$($(GO) env GOROOT)/lib/wasm/wasm_exec.js" $(WASM_EXEC_OUT)
+	cp wasm_support/wasm_exec.js $(WASM_EXEC_OUT)
