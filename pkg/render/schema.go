@@ -265,24 +265,6 @@ func getTypeName(t reflect.Type) string {
 	}
 }
 
-// extractEnums returns all enum types
-func extractEnums() map[string]*SchemaEnum {
-	return map[string]*SchemaEnum{
-		"ViewModelImportance": {
-			Values:      []string{"None", "Healthy", "Notice", "Minor", "Warning", "Major", "Severe", "Critical"},
-			Description: "Alert severity levels (0-7)",
-		},
-		"EventType": {
-			Values:      []string{EventType_Alarm, EventType_Insight, EventType_CustomInsight, EventType_Synthetics, EventType_Mitigation, EventType_Generic},
-			Description: "Event type classification",
-		},
-		"DetailTag": {
-			Values:      []string{"", "metric", "dimension", "url", "device", "device_labels", "device_label"},
-			Description: "Detail categorization tags",
-		},
-	}
-}
-
 // ImportanceValueMap provides int to string mapping for enum values
 var ImportanceValueMap = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "None",

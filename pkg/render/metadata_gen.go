@@ -133,6 +133,21 @@ var functionMetadata = []*SchemaFunction{
 	},
 }
 
+// enumDefinitions contains all enum types.
+// This is auto-generated from type definitions and const blocks in types.go.
+var enumDefinitions = map[string]*SchemaEnum{
+	"DetailTag": {
+		Values:      []string{"", "metric", "dimension", "url", "device", "device_labels", "device_label"},
+		Description: "DetailTag categorizes event details.",
+	},
+	"EventType": {
+		Values: []string{"alarm", "insight", "custom-insight", "synthetic", "mitigation", "generic"},
+	},
+	"ViewModelImportance": {
+		Values: []string{"None", "Healthy", "Notice", "Minor", "Warning", "Major", "Severe", "Critical"},
+	},
+}
+
 // getMethodDescription looks up a method's documentation by type and method name.
 // Returns empty string if not found.
 func getMethodDescription(typeName, methodName string) string {
@@ -147,4 +162,10 @@ func getMethodDescription(typeName, methodName string) string {
 // The slice is sorted by function name for consistency.
 func extractFunctions() []*SchemaFunction {
 	return functionMetadata
+}
+
+// extractEnums returns all enum definitions.
+// Enums are auto-generated from type definitions and const blocks.
+func extractEnums() map[string]*SchemaEnum {
+	return enumDefinitions
 }

@@ -127,17 +127,30 @@ func (event EventViewModel) IsSynthetic() bool {
 	return event.Type == EventType_Synthetics
 }
 
+// DetailTag categorizes event details.
+type DetailTag string
+
+const (
+	DetailTag_Empty        DetailTag = ""
+	DetailTag_Metric       DetailTag = "metric"
+	DetailTag_Dimension    DetailTag = "dimension"
+	DetailTag_URL          DetailTag = "url"
+	DetailTag_Device       DetailTag = "device"
+	DetailTag_DeviceLabels DetailTag = "device_labels"
+	DetailTag_DeviceLabel  DetailTag = "device_label"
+)
+
 type EventViewModelDetail struct {
 	Name  string      `description:"Detail field name/key"`
 	Label string      `json:",omitempty" description:"Human-readable label for the detail"`
 	Value interface{} `description:"Detail value (can be any type)"`
-	Tag   string      `json:"-" description:"Categorization tag (metric, dimension, url, device, etc.)"`
+	Tag   DetailTag   `json:"-" description:"Categorization tag (metric, dimension, url, device, etc.)"`
 }
 
 func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
 	type EvmDetailAsInput EventViewModelDetail
 	aux := &struct {
-		Tag string `json:"Tag"`
+		Tag DetailTag `json:"Tag"`
 		*EvmDetailAsInput
 	}{
 		EvmDetailAsInput: (*EvmDetailAsInput)(d),
@@ -152,7 +165,7 @@ func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
 type EventViewModelDetails []*EventViewModelDetail
 
 // WithTag filters details by the specified tag.
-func (details EventViewModelDetails) WithTag(tag string) EventViewModelDetails {
+func (details EventViewModelDetails) WithTag(tag DetailTag) EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {
 		if detail.Tag == tag {
@@ -224,7 +237,7 @@ func (details EventViewModelDetails) Has(name string) bool {
 }
 
 // HasTag checks if any detail has the specified tag.
-func (details *EventViewModelDetails) HasTag(tag string) bool {
+func (details *EventViewModelDetails) HasTag(tag DetailTag) bool {
 	for _, detail := range *details {
 		if detail.Tag == tag {
 			return true
