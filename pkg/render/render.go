@@ -22,11 +22,11 @@ type RenderResponse struct {
 	Output string `json:"output"`
 	Error  string `json:"error,omitempty"`
 
-    // simple fields
+	// simple fields
 	Line   int  `json:"line,omitempty"`
 	Column *int `json:"column,omitempty"`
 
-    // more sophisticated error handling
+	// more sophisticated error handling
 	StartLine   int  `json:"startLine,omitempty"`
 	StartColumn *int `json:"startColumn,omitempty"`
 	EndLine     int  `json:"endLine,omitempty"`
@@ -85,7 +85,7 @@ func renderErr(err error) RenderResponse {
 	}
 
 	resp := RenderResponse{
-		Error: errMsg,
+		Error:  errMsg,
 		Line:   line,
 		Column: colPtr,
 		// range fields - start position is known, end position defaults to same line

@@ -102,22 +102,27 @@ func (e *EventViewModel) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// IsAlarm returns true if event type is alarm.
 func (event EventViewModel) IsAlarm() bool {
 	return event.Type == EventType_Alarm
 }
 
+// IsInsight returns true if event type is insight or custom-insight.
 func (event EventViewModel) IsInsight() bool {
 	return event.Type == EventType_Insight || event.Type == EventType_CustomInsight
 }
 
+// IsCustomInsight returns true if event type is custom-insight.
 func (event EventViewModel) IsCustomInsight() bool {
 	return event.Type == EventType_CustomInsight
 }
 
+// IsMitigation returns true if event type is mitigation.
 func (event EventViewModel) IsMitigation() bool {
 	return event.Type == EventType_Mitigation
 }
 
+// IsSynthetic returns true if event type is synthetic.
 func (event EventViewModel) IsSynthetic() bool {
 	return event.Type == EventType_Synthetics
 }
@@ -146,6 +151,7 @@ func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
 
 type EventViewModelDetails []*EventViewModelDetail
 
+// WithTag filters details by the specified tag.
 func (details EventViewModelDetails) WithTag(tag string) EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {
@@ -156,6 +162,7 @@ func (details EventViewModelDetails) WithTag(tag string) EventViewModelDetails {
 	return result
 }
 
+// General returns details with an empty tag.
 func (details EventViewModelDetails) General() EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {
@@ -166,6 +173,7 @@ func (details EventViewModelDetails) General() EventViewModelDetails {
 	return result
 }
 
+// WithNames filters details by the given names.
 func (details EventViewModelDetails) WithNames(names ...string) EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {
@@ -178,6 +186,7 @@ func (details EventViewModelDetails) WithNames(names ...string) EventViewModelDe
 	return result
 }
 
+// Names returns all detail names.
 func (details EventViewModelDetails) Names() []string {
 	result := make([]string, 0, len(details))
 	for _, detail := range details {
@@ -186,6 +195,7 @@ func (details EventViewModelDetails) Names() []string {
 	return result
 }
 
+// Values returns all detail values.
 func (details EventViewModelDetails) Values() []interface{} {
 	result := make([]interface{}, 0, len(details))
 	for _, detail := range details {
@@ -194,6 +204,7 @@ func (details EventViewModelDetails) Values() []interface{} {
 	return result
 }
 
+// ToMap converts details to a name-to-value map.
 func (details EventViewModelDetails) ToMap() map[string]interface{} {
 	result := make(map[string]interface{})
 	for _, detail := range details {
@@ -202,6 +213,7 @@ func (details EventViewModelDetails) ToMap() map[string]interface{} {
 	return result
 }
 
+// Has checks if a detail with the given name exists.
 func (details EventViewModelDetails) Has(name string) bool {
 	for _, detail := range details {
 		if detail.Name == name {
@@ -211,6 +223,7 @@ func (details EventViewModelDetails) Has(name string) bool {
 	return false
 }
 
+// HasTag checks if any detail has the specified tag.
 func (details *EventViewModelDetails) HasTag(tag string) bool {
 	for _, detail := range *details {
 		if detail.Tag == tag {
@@ -220,6 +233,7 @@ func (details *EventViewModelDetails) HasTag(tag string) bool {
 	return false
 }
 
+// AddDetail adds a detail to the event's Details collection.
 func (event *EventViewModel) AddDetail(detail *EventViewModelDetail) {
 	if event.Details == nil {
 		event.Details = make(EventViewModelDetails, 0, 1)
@@ -227,6 +241,7 @@ func (event *EventViewModel) AddDetail(detail *EventViewModelDetail) {
 	event.Details = append(event.Details, detail)
 }
 
+// Get retrieves a detail by name.
 func (details EventViewModelDetails) Get(name string) *EventViewModelDetail {
 	for _, detail := range details {
 		if detail.Name == name {
@@ -240,10 +255,12 @@ func (details EventViewModelDetails) Get(name string) *EventViewModelDetail {
 	}
 }
 
+// GetValue retrieves a value by name.
 func (details EventViewModelDetails) GetValue(name string) interface{} {
 	return details.Get(name).Value
 }
 
+// LabelOrName returns Label if set, otherwise returns Name.
 func (detail EventViewModelDetail) LabelOrName() string {
 	if detail.Label != "" {
 		return detail.Label
@@ -252,11 +269,11 @@ func (detail EventViewModelDetail) LabelOrName() string {
 }
 
 type NotificationViewModel struct {
-	CompanyID   int                      `description:"Unique identifier for the company"`
-	CompanyName string                   `json:"-" description:"Name of the company"`
-	Now         time.Time                `json:"-" description:"Current timestamp when notification is generated"`
-	RawEvents   []*EventViewModel        `json:"-" description:"List of all events in this notification"`
-	Config      *NotificationViewConfig  `json:"-" description:"Notification configuration settings"`
+	CompanyID   int                     `description:"Unique identifier for the company"`
+	CompanyName string                  `json:"-" description:"Name of the company"`
+	Now         time.Time               `json:"-" description:"Current timestamp when notification is generated"`
+	RawEvents   []*EventViewModel       `json:"-" description:"List of all events in this notification"`
+	Config      *NotificationViewConfig `json:"-" description:"Notification configuration settings"`
 }
 
 func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
@@ -286,50 +303,62 @@ type NotificationViewConfig struct {
 	EmailTo    []string `description:"List of email recipients"`
 }
 
+// BasePortalURL returns the portal base URL.
 func (vm *NotificationViewModel) BasePortalURL() string {
 	return fmt.Sprintf("https://%s", vm.Config.BaseDomain)
 }
 
+// NotificationsSettingsURL returns the notifications settings URL.
 func (vm *NotificationViewModel) NotificationsSettingsURL() string {
 	return fmt.Sprintf("https://%s/v4/settings/notifications", vm.Config.BaseDomain)
 }
 
+// SyntheticsDashboardURL returns the synthetics dashboard URL.
 func (vm *NotificationViewModel) SyntheticsDashboardURL() string {
 	return fmt.Sprintf("https://%s/v4/synthetics/dashboard", vm.Config.BaseDomain)
 }
 
+// NowDate returns the current date formatted as 'January 2, 2006'.
 func (vm *NotificationViewModel) NowDate() string {
 	return vm.Now.Format("January 2, 2006")
 }
 
+// NowRFC3339 returns the current time in RFC3339 format.
 func (vm *NotificationViewModel) NowRFC3339() string {
 	return vm.Now.Format(time.RFC3339)
 }
 
+// NowDatetime returns the current time as '2006-01-02 15:04:05 UTC'.
 func (vm *NotificationViewModel) NowDatetime() string {
 	return vm.Now.Format("2006-01-02 15:04:05 UTC")
 }
 
+// NowUnix returns the current time as Unix timestamp.
 func (vm *NotificationViewModel) NowUnix() int64 {
 	return vm.Now.Unix()
 }
 
+// Copyrights returns the copyright string with current year.
 func (vm *NotificationViewModel) Copyrights() string {
 	return fmt.Sprintf("© %d Kentik", vm.Now.Year())
 }
 
+// IsSingleEvent returns true if exactly one event.
 func (vm *NotificationViewModel) IsSingleEvent() bool {
 	return len(vm.RawEvents) == 1
 }
 
+// IsMultipleEvents returns true if more than one event.
 func (vm *NotificationViewModel) IsMultipleEvents() bool {
 	return len(vm.RawEvents) > 1
 }
 
+// IsAtLeastOneEvent returns true if at least one event exists.
 func (vm *NotificationViewModel) IsAtLeastOneEvent() bool {
 	return len(vm.RawEvents) > 0
 }
 
+// Event returns the first event or nil if empty.
 func (vm *NotificationViewModel) Event() *EventViewModel {
 	if len(vm.RawEvents) == 0 {
 		return nil
@@ -337,10 +366,12 @@ func (vm *NotificationViewModel) Event() *EventViewModel {
 	return vm.RawEvents[0]
 }
 
+// Events returns all events as a slice.
 func (vm *NotificationViewModel) Events() []*EventViewModel {
 	return vm.RawEvents
 }
 
+// ActiveCount returns the count of currently active events.
 func (vm *NotificationViewModel) ActiveCount() int {
 	var result int
 	for _, event := range vm.RawEvents {
@@ -351,6 +382,7 @@ func (vm *NotificationViewModel) ActiveCount() int {
 	return result
 }
 
+// InactiveCount returns the count of inactive events.
 func (vm *NotificationViewModel) InactiveCount() int {
 	var result int
 	for _, event := range vm.RawEvents {
@@ -361,6 +393,7 @@ func (vm *NotificationViewModel) InactiveCount() int {
 	return result
 }
 
+// IsInsightsOnly returns true if all events are insights.
 func (vm *NotificationViewModel) IsInsightsOnly() bool {
 	for _, evt := range vm.RawEvents {
 		if !evt.IsInsight() {
@@ -370,6 +403,7 @@ func (vm *NotificationViewModel) IsInsightsOnly() bool {
 	return true
 }
 
+// IsSyntheticsOnly returns true if all events are synthetics.
 func (vm *NotificationViewModel) IsSyntheticsOnly() bool {
 	for _, evt := range vm.RawEvents {
 		if !evt.IsSynthetic() {
@@ -379,10 +413,12 @@ func (vm *NotificationViewModel) IsSyntheticsOnly() bool {
 	return true
 }
 
+// IsSingleCustomInsightOnly returns true if single custom insight event.
 func (vm *NotificationViewModel) IsSingleCustomInsightOnly() bool {
 	return len(vm.RawEvents) == 1 && vm.RawEvents[0].IsCustomInsight()
 }
 
+// IsSynthOnly is an alias for IsSyntheticsOnly.
 func (vm *NotificationViewModel) IsSynthOnly() bool {
 	for _, evt := range vm.RawEvents {
 		if !evt.IsSynthetic() {
@@ -392,6 +428,7 @@ func (vm *NotificationViewModel) IsSynthOnly() bool {
 	return true
 }
 
+// Headline returns the generated headline text.
 func (vm *NotificationViewModel) Headline() string {
 	segments := make([]string, 0)
 	segments = append(segments, "Kentik")
@@ -410,6 +447,7 @@ func (vm *NotificationViewModel) Headline() string {
 	return strings.Join(segments, " ")
 }
 
+// Summary returns the generated summary text.
 func (vm *NotificationViewModel) Summary() string {
 	if vm.IsSingleEvent() {
 		return vm.Event().Description
@@ -424,8 +462,7 @@ func (vm *NotificationViewModel) Summary() string {
 	return strings.Join(segments, ", ")
 }
 
-// filter details to only ones with a metric tag and prettify their
-// values rounding the float values and converting bits to x-bits/s
+// PrettifiedMetrics returns metric details with formatted values.
 func (details EventViewModelDetails) PrettifiedMetrics() EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {

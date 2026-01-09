@@ -1,8 +1,9 @@
+//go:generate go run ../../cmd/codegen/main.go -pkg render -dir . -output metadata_gen.go
+
 package render
 
 import (
 	"reflect"
-	"sort"
 )
 
 // SchemaField represents a field in the view model
@@ -262,101 +263,6 @@ func getTypeName(t reflect.Type) string {
 	default:
 		return t.String()
 	}
-}
-
-
-func getMethodDescription(typeName, methodName string) string {
-	key := typeName + "." + methodName
-
-	descriptions := map[string]string{
-		// NotificationViewModel methods
-		"NotificationViewModel.Event":                  "Returns the first event (or nil if empty)",
-		"NotificationViewModel.Events":                 "Returns all events as a slice",
-		"NotificationViewModel.IsSingleEvent":          "True if exactly one event",
-		"NotificationViewModel.IsMultipleEvents":       "True if more than one event",
-		"NotificationViewModel.IsAtLeastOneEvent":      "True if at least one event exists",
-		"NotificationViewModel.ActiveCount":            "Count of currently active events",
-		"NotificationViewModel.InactiveCount":          "Count of inactive events",
-		"NotificationViewModel.IsInsightsOnly":         "True if all events are insights",
-		"NotificationViewModel.IsSyntheticsOnly":       "True if all events are synthetics",
-		"NotificationViewModel.IsSynthOnly":            "Alias for IsSyntheticsOnly",
-		"NotificationViewModel.IsSingleCustomInsightOnly": "True if single custom insight event",
-		"NotificationViewModel.Headline":               "Generated headline text",
-		"NotificationViewModel.Summary":                "Generated summary text",
-		"NotificationViewModel.BasePortalURL":          "Returns portal URL",
-		"NotificationViewModel.NotificationsSettingsURL": "Returns notifications settings URL",
-		"NotificationViewModel.SyntheticsDashboardURL": "Returns synthetics dashboard URL",
-		"NotificationViewModel.NowDate":                "Current date formatted as 'January 2, 2006'",
-		"NotificationViewModel.NowRFC3339":             "Current time in RFC3339 format",
-		"NotificationViewModel.NowDatetime":            "Current time as '2006-01-02 15:04:05 UTC'",
-		"NotificationViewModel.NowUnix":                "Current time as Unix timestamp",
-		"NotificationViewModel.Copyrights":             "Copyright string with current year",
-
-		// EventViewModel methods
-		"EventViewModel.IsAlarm":         "True if event type is alarm",
-		"EventViewModel.IsInsight":       "True if event type is insight or custom-insight",
-		"EventViewModel.IsCustomInsight": "True if event type is custom-insight",
-		"EventViewModel.IsMitigation":    "True if event type is mitigation",
-		"EventViewModel.IsSynthetic":     "True if event type is synthetic",
-
-		// EventViewModelDetails methods
-		"EventViewModelDetails.WithTag":        "Filter details by tag",
-		"EventViewModelDetails.General":        "Get details with empty tag",
-		"EventViewModelDetails.WithNames":      "Filter details by names",
-		"EventViewModelDetails.Names":          "Get all detail names",
-		"EventViewModelDetails.Values":         "Get all detail values",
-		"EventViewModelDetails.ToMap":          "Convert to name->value map",
-		"EventViewModelDetails.Has":            "Check if detail with name exists",
-		"EventViewModelDetails.HasTag":         "Check if any detail has tag",
-		"EventViewModelDetails.Get":            "Get detail by name",
-		"EventViewModelDetails.GetValue":       "Get value by name",
-		"EventViewModelDetails.PrettifiedMetrics": "Get metric details with formatted values",
-
-		// EventViewModelDetail methods
-		"EventViewModelDetail.LabelOrName": "Returns Label if set, otherwise Name",
-	}
-
-	if desc, ok := descriptions[key]; ok {
-		return desc
-	}
-	return ""
-}
-
-// extractFunctions returns all template functions
-func extractFunctions() []*SchemaFunction {
-	functions := []*SchemaFunction{
-		// String functions
-		{Name: "toUpper", Signature: "(s string) string", Description: "Convert string to uppercase", Category: "string"},
-		{Name: "title", Signature: "(s string) string", Description: "Convert string to title case", Category: "string"},
-		{Name: "trimSpace", Signature: "(s string) string", Description: "Remove leading and trailing whitespace", Category: "string"},
-		{Name: "split", Signature: "(s string, sep string) []string", Description: "Split string by separator", Category: "string"},
-
-		// JSON functions
-		{Name: "toJSON", Signature: "(v interface{}) string", Description: "Convert value to JSON string", Category: "conversion"},
-		{Name: "j", Signature: "(v interface{}) string", Description: "Alias for toJSON", Category: "conversion"},
-		{Name: "uglifyJSON", Signature: "(s string) string", Description: "Compact JSON string (remove whitespace)", Category: "conversion"},
-		{Name: "explodeJSONKeys", Signature: "(s string) string", Description: "Extract object key-values without braces", Category: "conversion"},
-		{Name: "x", Signature: "(s string) string", Description: "Alias for explodeJSONKeys", Category: "conversion"},
-
-		// Time functions
-		{Name: "timeRfc3339", Signature: "(v interface{}) string", Description: "Convert to RFC3339 format (accepts string, int, time.Time)", Category: "time"},
-
-		// Utility functions
-		{Name: "join", Signature: "(index int) string", Description: "Returns comma for index > 0, empty for 0 (for list joining)", Category: "utility"},
-		{Name: "joinWith", Signature: "(index int, sep string) string", Description: "Returns separator for index > 0, empty for 0", Category: "utility"},
-
-		// Importance/severity functions
-		{Name: "importanceLabel", Signature: "(severity ViewModelImportance) string", Description: "Get title-case label for importance level", Category: "formatting"},
-		{Name: "importanceToColor", Signature: "(severity ViewModelImportance) string", Description: "Get hex color for importance level", Category: "formatting"},
-		{Name: "importanceToEmoji", Signature: "(severity ViewModelImportance) string", Description: "Get emoji(s) for importance level", Category: "formatting"},
-	}
-
-	// Sort by name for consistent output
-	sort.Slice(functions, func(i, j int) bool {
-		return functions[i].Name < functions[j].Name
-	})
-
-	return functions
 }
 
 // extractEnums returns all enum types
