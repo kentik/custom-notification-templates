@@ -16,6 +16,14 @@ type SchemaField struct {
 	Children    []*SchemaField `json:"children,omitempty"`
 	IsMethod    bool           `json:"isMethod,omitempty"`
 	ReturnType  string         `json:"returnType,omitempty"`
+	EnumType    string         `json:"enumType,omitempty"`
+}
+
+// enumFieldMapping maps field names to their corresponding enum types
+var enumFieldMapping = map[string]string{
+	"Type":       "EventType",
+	"Tag":        "DetailTag",
+	"Importance": "ViewModelImportance",
 }
 
 // SchemaFunction represents a template function
@@ -130,6 +138,11 @@ func extractTypeFields(t reflect.Type, path string) []*SchemaField {
 			sf.Children = append(sf.Children, extractTypeMethods(reflect.PtrTo(fieldType), childPath)...)
 		} else {
 			sf.Type = getTypeName(fieldType)
+		}
+
+		// Set enum type if this field maps to a known enum
+		if enumType, ok := enumFieldMapping[field.Name]; ok {
+			sf.EnumType = enumType
 		}
 
 		result = append(result, sf)
