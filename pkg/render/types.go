@@ -316,12 +316,12 @@ type NotificationViewConfig struct {
 	EmailTo    []string `description:"List of email recipients"`
 }
 
-// BasePortalURL returns the portal base URL.
+// BasePortalURL returns the portal base URL (without path).
 func (vm *NotificationViewModel) BasePortalURL() string {
 	return fmt.Sprintf("https://%s", vm.Config.BaseDomain)
 }
 
-// NotificationsSettingsURL returns the notifications settings URL.
+// NotificationsSettingsURL returns the notification channels URL.
 func (vm *NotificationViewModel) NotificationsSettingsURL() string {
 	return fmt.Sprintf("https://%s/v4/settings/notifications", vm.Config.BaseDomain)
 }
@@ -336,7 +336,7 @@ func (vm *NotificationViewModel) NowDate() string {
 	return vm.Now.Format("January 2, 2006")
 }
 
-// NowRFC3339 returns the current time in RFC3339 format.
+// NowRFC3339 returns the current time in RFC3339 format, example: 2006-01-02T15:04:05Z
 func (vm *NotificationViewModel) NowRFC3339() string {
 	return vm.Now.Format(time.RFC3339)
 }
@@ -356,12 +356,12 @@ func (vm *NotificationViewModel) Copyrights() string {
 	return fmt.Sprintf("© %d Kentik", vm.Now.Year())
 }
 
-// IsSingleEvent returns true if exactly one event.
+// IsSingleEvent returns true if notification message is triggered with a single event.
 func (vm *NotificationViewModel) IsSingleEvent() bool {
 	return len(vm.RawEvents) == 1
 }
 
-// IsMultipleEvents returns true if more than one event.
+// IsMultipleEvents returns true if notification message is triggered with more than one event (currently only insight digest notifications).
 func (vm *NotificationViewModel) IsMultipleEvents() bool {
 	return len(vm.RawEvents) > 1
 }
@@ -406,7 +406,7 @@ func (vm *NotificationViewModel) InactiveCount() int {
 	return result
 }
 
-// IsInsightsOnly returns true if all events are insights.
+// IsInsightsOnly returns true if all events are from Insights.
 func (vm *NotificationViewModel) IsInsightsOnly() bool {
 	for _, evt := range vm.RawEvents {
 		if !evt.IsInsight() {
@@ -416,7 +416,7 @@ func (vm *NotificationViewModel) IsInsightsOnly() bool {
 	return true
 }
 
-// IsSyntheticsOnly returns true if all events are synthetics.
+// IsSyntheticsOnly returns true if all events are from Synthetics.
 func (vm *NotificationViewModel) IsSyntheticsOnly() bool {
 	for _, evt := range vm.RawEvents {
 		if !evt.IsSynthetic() {
