@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var lineColumnRegex = regexp.MustCompile(`template:\s*[^:]+:(\d+)(?::(\d+))?`)
+
 type RenderRequest struct {
 	Name     string          `json:"name"`
 	Template string          `json:"template"`
@@ -19,8 +21,16 @@ type RenderRequest struct {
 type RenderResponse struct {
 	Output string `json:"output"`
 	Error  string `json:"error,omitempty"`
-	Line   int    `json:"line,omitempty"`
-	Column *int   `json:"column,omitempty"`
+
+	// simple fields
+	Line   int  `json:"line,omitempty"`
+	Column *int `json:"column,omitempty"`
+
+	// more sophisticated error handling
+	StartLine   int  `json:"startLine,omitempty"`
+	StartColumn *int `json:"startColumn,omitempty"`
+	EndLine     int  `json:"endLine,omitempty"`
+	EndColumn   *int `json:"endColumn,omitempty"`
 }
 
 func Render(req RenderRequest) RenderResponse {
@@ -74,15 +84,25 @@ func renderErr(err error) RenderResponse {
 		colPtr = &col
 	}
 
-	return RenderResponse{Error: errMsg, Line: line, Column: colPtr}
+	resp := RenderResponse{
+		Error:  errMsg,
+		Line:   line,
+		Column: colPtr,
+		// range fields - start position is known, end position defaults to same line
+		StartLine:   line,
+		StartColumn: colPtr,
+		EndLine:     line,
+		EndColumn:   colPtr,
+	}
+
+	return resp
 }
 
 func extractLineColumn(errMsg string) (int, int) {
 	//  - "template: subject:4: ..."
 	//  - "template: body:7:3: ..."
 	//  - "template: template:7:3: ..."
-	re := regexp.MustCompile(`template:\s*[^:]+:(\d+)(?::(\d+))?`)
-	matches := re.FindStringSubmatch(errMsg)
+	matches := lineColumnRegex.FindStringSubmatch(errMsg)
 
 	if len(matches) > 1 {
 		line, _ := strconv.Atoi(matches[1])

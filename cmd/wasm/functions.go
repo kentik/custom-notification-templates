@@ -1,0 +1,88 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/kentik/custom-notification-templates/pkg/render"
+)
+
+// resultErrWrapper formats an error as a JSON string for JS consumption.
+func resultErrWrapper(err error) string {
+	errMap := map[string]string{"error": err.Error()}
+	b, errJ := json.Marshal(errMap)
+	if errJ != nil {
+		return `{"error": "Unexpected error: failed to marshal error response"}`
+	}
+	return string(b)
+}
+
+// processRender handles the core rendering logic, independent of JS types.
+// It returns a JSON string containing the result or error.
+func processRender(templateText, dataJSON string) string {
+	// Capture panics within this function's scope (before goroutine)
+	defer func() {
+		if r := recover(); r != nil {
+			// This might be hard to return if we crashed, but we try.
+			// However, the goroutine handles most panics.
+		}
+	}()
+
+	req := render.RenderRequest{
+		Template: templateText,
+		Data:     json.RawMessage(dataJSON),
+	}
+
+	// Channel to receive the result or error/panic from the render goroutine
+	type renderResult struct {
+		resp render.RenderResponse
+		err  error
+	}
+	ch := make(chan renderResult, 1)
+
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				ch <- renderResult{err: fmt.Errorf("panic in render: %v", r)}
+			}
+		}()
+		ch <- renderResult{resp: render.Render(req)}
+	}()
+
+	select {
+	case res := <-ch:
+		if res.err != nil {
+			return resultErrWrapper(res.err)
+		}
+
+		b, err := json.Marshal(res.resp)
+		if err != nil {
+			return resultErrWrapper(fmt.Errorf("Unexpected error: failed to marshal response: %v", err))
+		}
+		return string(b)
+
+	case <-time.After(5 * time.Second):
+		return resultErrWrapper(fmt.Errorf("render timed out after 5s"))
+	}
+}
+
+// processGetSchema returns the schema JSON string.
+func processGetSchema() string {
+	defer func() {
+		if r := recover(); r != nil {
+			// Panic recovery is less critical here as GetSchema is simple, but good practice.
+		}
+	}()
+
+	schema := render.GetSchema()
+
+	b, err := json.Marshal(schema)
+	if err != nil {
+		errMap := map[string]string{"error": fmt.Sprintf("Failed to marshal schema: %v", err)}
+		b, _ := json.Marshal(errMap)
+		return string(b)
+	}
+
+	return string(b)
+}

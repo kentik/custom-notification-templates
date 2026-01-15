@@ -1,10 +1,11 @@
 module github.com/kentik/custom-notification-templates
 
-go 1.21
+go 1.24.0
 
 require (
 	github.com/stretchr/testify v1.9.0
 	github.com/xeipuuv/gojsonschema v1.2.0
+	golang.org/x/text v0.32.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
