@@ -1,9 +1,11 @@
-//go:generate go run ../../cmd/codegen/main.go -pkg render -dir . -output metadata_gen.go
+//go:generate go run ../../cmd/codegen/main.go -pkg render -dir . -output metadata_gen.go -extra-dirs ../types
 
 package render
 
 import (
 	"reflect"
+
+	"github.com/kentik/custom-notification-templates/pkg/types"
 )
 
 // SchemaField represents a field in the view model
@@ -61,11 +63,11 @@ func GetSchema() *Schema {
 func extractFields() []*SchemaField {
 	var result []*SchemaField
 
-	t := reflect.TypeOf(NotificationViewModel{})
+	t := reflect.TypeOf(types.NotificationViewModel{})
 	result = append(result, extractTypeFields(t, ".")...)
 
 	// Also extract methods that are commonly used
-	pt := reflect.TypeOf(&NotificationViewModel{})
+	pt := reflect.TypeOf(&types.NotificationViewModel{})
 	result = append(result, extractTypeMethods(pt, ".")...)
 
 	return result
@@ -266,13 +268,13 @@ func getTypeName(t reflect.Type) string {
 }
 
 // ImportanceValueMap provides int to string mapping for enum values
-var ImportanceValueMap = map[ViewModelImportance]string{
-	ViewModelImportance_None:     "None",
-	ViewModelImportance_Healthy:  "Healthy",
-	ViewModelImportance_Notice:   "Notice",
-	ViewModelImportance_Minor:    "Minor",
-	ViewModelImportance_Warning:  "Warning",
-	ViewModelImportance_Major:    "Major",
-	ViewModelImportance_Severe:   "Severe",
-	ViewModelImportance_Critical: "Critical",
+var ImportanceValueMap = map[types.ViewModelImportance]string{
+	types.ViewModelImportance_None:     "None",
+	types.ViewModelImportance_Healthy:  "Healthy",
+	types.ViewModelImportance_Notice:   "Notice",
+	types.ViewModelImportance_Minor:    "Minor",
+	types.ViewModelImportance_Warning:  "Warning",
+	types.ViewModelImportance_Major:    "Major",
+	types.ViewModelImportance_Severe:   "Severe",
+	types.ViewModelImportance_Critical: "Critical",
 }

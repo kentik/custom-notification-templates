@@ -1,13 +1,18 @@
-package render
+package types
 
 import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"reflect"
 	"strings"
 	"time"
 )
 
+// EventType represents the notification event category.
+type EventType string
+
+// EventType_* and EventApplication_* constants define supported values.
 const (
 	EventType_Alarm         string = "alarm"
 	EventType_Insight       string = "insight"
@@ -15,8 +20,18 @@ const (
 	EventType_Synthetics    string = "synthetic"
 	EventType_Mitigation    string = "mitigation"
 	EventType_Generic       string = "generic"
+
+	EventApplication_Unspecified = ""
+	EventApplication_NMS         = "nms"
+	EventApplication_Kmetrics    = "kmetrics"
+	EventApplication_Ktrac       = "ktrac"
+	EventApplication_Synthetics  = "synthetics"
+	EventApplication_DDos        = "ddos"
+	EventApplication_Core        = "core"
+	EventApplication_Cloud       = "cloud"
 )
 
+// ViewModelImportance represents severity levels for view model events.
 type ViewModelImportance int32
 
 const (
@@ -30,6 +45,7 @@ const (
 	ViewModelImportance_Critical ViewModelImportance = 7
 )
 
+// ImportanceNames maps severities to display names.
 var ImportanceNames = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "n/a",
 	ViewModelImportance_Healthy:  "healthy",
@@ -41,6 +57,7 @@ var ImportanceNames = map[ViewModelImportance]string{
 	ViewModelImportance_Critical: "critical",
 }
 
+// ImportanceToColors maps severities to hex color values.
 var ImportanceToColors = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "#999999",
 	ViewModelImportance_Healthy:  "#1E9E1E",
@@ -52,6 +69,7 @@ var ImportanceToColors = map[ViewModelImportance]string{
 	ViewModelImportance_Critical: "#A82A2A",
 }
 
+// ImportanceToEmojis maps severities to emoji strings.
 var ImportanceToEmojis = map[ViewModelImportance]string{
 	ViewModelImportance_None:     "",
 	ViewModelImportance_Healthy:  ":warning: :large_green_circle:",
@@ -63,6 +81,7 @@ var ImportanceToEmojis = map[ViewModelImportance]string{
 	ViewModelImportance_Critical: ":warning: :red_circle:",
 }
 
+// EventViewModel holds core event data for templates.
 type EventViewModel struct {
 	Type           string                `description:"Event type (alarm, insight, synthetic, mitigation, generic)"`
 	Description    string                `json:",omitempty" description:"Human-readable event description"`
@@ -76,8 +95,12 @@ type EventViewModel struct {
 	Importance     ViewModelImportance   `json:"-" description:"Severity level (0-7)"`
 	GroupName      string                `json:"-" description:"Name of the event group"`
 	Details        EventViewModelDetails `json:"-" description:"List of event detail key-value pairs"`
+	IsTestEvent    bool                  `json:"-" description:"Whether the event is a test event"`
+	BaseDomain     string                `json:"-" description:"Portal base domain (e.g., portal.kentik.com)"`
+	Application    string                `json:"-" description:"Application that triggered the event"`
 }
 
+// UnmarshalJSON decodes an EventViewModel with custom fields.
 func (e *EventViewModel) UnmarshalJSON(data []byte) error {
 	type EvmAsInput EventViewModel
 	aux := &struct {
@@ -86,6 +109,9 @@ func (e *EventViewModel) UnmarshalJSON(data []byte) error {
 		Importance     ViewModelImportance   `json:"Importance"`
 		GroupName      string                `json:"GroupName"`
 		Details        EventViewModelDetails `json:"Details"`
+		IsTestEvent    bool                  `json:"IsTestEvent"`
+		BaseDomain     string                `json:"BaseDomain"`
+		Application    string                `json:"Application"`
 		*EvmAsInput
 	}{
 		EvmAsInput: (*EvmAsInput)(e),
@@ -99,7 +125,19 @@ func (e *EventViewModel) UnmarshalJSON(data []byte) error {
 	e.Importance = aux.Importance
 	e.GroupName = aux.GroupName
 	e.Details = aux.Details
+	e.IsTestEvent = aux.IsTestEvent
+	e.BaseDomain = aux.BaseDomain
+	e.Application = aux.Application
 	return nil
+}
+
+// TopLevelApplication returns the last application segment.
+func (event EventViewModel) TopLevelApplication() string {
+	parts := strings.Split(event.Application, ".")
+	if len(parts) > 0 && parts[len(parts)-1] != "" {
+		return parts[len(parts)-1]
+	}
+	return event.Application
 }
 
 // IsAlarm returns true if event type is alarm.
@@ -127,11 +165,57 @@ func (event EventViewModel) IsSynthetic() bool {
 	return event.Type == EventType_Synthetics
 }
 
+// IsTest reports whether the event is a test event.
+func (event EventViewModel) IsTest() bool {
+	return event.IsTestEvent
+}
+
+// IsNMSApp reports whether the event application is NMS.
+func (event EventViewModel) IsNMSApp() bool {
+	return event.TopLevelApplication() == EventApplication_NMS
+}
+
+// IsKmetricsApp reports whether the event application is Kmetrics.
+func (event EventViewModel) IsKmetricsApp() bool {
+	return event.TopLevelApplication() == EventApplication_Kmetrics
+}
+
+// IsSyntheticsApp reports whether the event application is Synthetics.
+func (event EventViewModel) IsSyntheticsApp() bool {
+	return event.TopLevelApplication() == EventApplication_Synthetics
+}
+
+// IsKtracApp reports whether the event application is Ktrac.
+func (event EventViewModel) IsKtracApp() bool {
+	return event.TopLevelApplication() == EventApplication_Ktrac
+}
+
+// IsTrafficApp reports whether the event application is Core.
+func (event EventViewModel) IsTrafficApp() bool {
+	return event.TopLevelApplication() == EventApplication_Core
+}
+
+// IsProtectApp reports whether the event application is DDoS.
+func (event EventViewModel) IsProtectApp() bool {
+	return event.TopLevelApplication() == EventApplication_DDos
+}
+
+// IsCloudApp reports whether the event application is Cloud.
+func (event EventViewModel) IsCloudApp() bool {
+	return event.TopLevelApplication() == EventApplication_Cloud
+}
+
+// BasePortalURL returns the portal base domain for the event.
+func (event EventViewModel) BasePortalURL() string {
+	return event.BaseDomain
+}
+
 // DetailTag categorizes event details.
 type DetailTag string
 
 const (
 	DetailTag_Empty        DetailTag = ""
+	DetailTag_General      DetailTag = "general"
 	DetailTag_Metric       DetailTag = "metric"
 	DetailTag_Dimension    DetailTag = "dimension"
 	DetailTag_URL          DetailTag = "url"
@@ -140,6 +224,7 @@ const (
 	DetailTag_DeviceLabel  DetailTag = "device_label"
 )
 
+// EventViewModelDetail represents a single event detail item.
 type EventViewModelDetail struct {
 	Name  string      `description:"Detail field name/key"`
 	Label string      `json:",omitempty" description:"Human-readable label for the detail"`
@@ -147,6 +232,7 @@ type EventViewModelDetail struct {
 	Tag   DetailTag   `json:"-" description:"Categorization tag (metric, dimension, url, device, etc.)"`
 }
 
+// UnmarshalJSON decodes an EventViewModelDetail with tags.
 func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
 	type EvmDetailAsInput EventViewModelDetail
 	aux := &struct {
@@ -162,6 +248,7 @@ func (d *EventViewModelDetail) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// EventViewModelDetails is a list of event detail items.
 type EventViewModelDetails []*EventViewModelDetail
 
 // WithTag filters details by the specified tag.
@@ -175,11 +262,22 @@ func (details EventViewModelDetails) WithTag(tag DetailTag) EventViewModelDetail
 	return result
 }
 
+// ValuesWithTag returns all detail values with the specified tag.
+func (details EventViewModelDetails) ValuesWithTag(tag DetailTag) []interface{} {
+	values := make([]interface{}, 0)
+	for _, detail := range details {
+		if detail.Tag == tag {
+			values = append(values, detail.Value)
+		}
+	}
+	return values
+}
+
 // General returns details with an empty tag.
 func (details EventViewModelDetails) General() EventViewModelDetails {
 	result := make(EventViewModelDetails, 0)
 	for _, detail := range details {
-		if detail.Tag == "" {
+		if detail.Tag == DetailTag_Empty || detail.Tag == DetailTag_General {
 			result = append(result, detail)
 		}
 	}
@@ -273,6 +371,17 @@ func (details EventViewModelDetails) GetValue(name string) interface{} {
 	return details.Get(name).Value
 }
 
+// GetStringValue retrieves a string value by name.
+func (details EventViewModelDetails) GetStringValue(name string) string {
+	val := details.Get(name).Value
+	switch v := val.(type) {
+	case string:
+		return v
+	default:
+		return ""
+	}
+}
+
 // LabelOrName returns Label if set, otherwise returns Name.
 func (detail EventViewModelDetail) LabelOrName() string {
 	if detail.Label != "" {
@@ -281,6 +390,29 @@ func (detail EventViewModelDetail) LabelOrName() string {
 	return detail.Name
 }
 
+// IsList reports whether the detail value is a list-like type.
+func (detail EventViewModelDetail) IsList() bool {
+	kind := reflect.ValueOf(detail.Value).Kind()
+	if kind == reflect.Slice || kind == reflect.Array || kind == reflect.Map {
+		return true
+	}
+	return false
+}
+
+// GetValues returns the detail value(s) as a slice.
+func (detail EventViewModelDetail) GetValues() []interface{} {
+	if detail.IsList() {
+		listVal := reflect.ValueOf(detail.Value)
+		ifList := make([]interface{}, listVal.Len())
+		for i := 0; i < listVal.Len(); i++ {
+			ifList[i] = listVal.Index(i).Interface()
+		}
+		return ifList
+	}
+	return []interface{}{detail.Value}
+}
+
+// NotificationViewModel is the root model for template rendering.
 type NotificationViewModel struct {
 	CompanyID   int                     `description:"Unique identifier for the company"`
 	CompanyName string                  `json:"-" description:"Name of the company"`
@@ -289,6 +421,7 @@ type NotificationViewModel struct {
 	Config      *NotificationViewConfig `json:"-" description:"Notification configuration settings"`
 }
 
+// UnmarshalJSON decodes a NotificationViewModel with derived fields.
 func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
 	type NvmAsInput NotificationViewModel
 	aux := &struct {
@@ -311,6 +444,7 @@ func (vm *NotificationViewModel) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// NotificationViewConfig stores configuration for rendering URLs.
 type NotificationViewConfig struct {
 	BaseDomain string   `description:"Portal base domain (e.g., portal.kentik.com)"`
 	EmailTo    []string `description:"List of email recipients"`
@@ -492,10 +626,15 @@ func (details EventViewModelDetails) PrettifiedMetrics() EventViewModelDetails {
 		label := detail.Label
 
 		// format bits with proper unit
-		if strings.HasPrefix(detail.Name, "bits") {
-			var prefix string
-			floatValue, prefix = formatBits(floatValue)
-			label = fmt.Sprintf("%sbits/s", prefix)
+		// format metrics with proper unit
+		namePrefixes := []string{"bits", "packets"}
+		for _, namePrefix := range namePrefixes {
+			if strings.HasPrefix(detail.Name, namePrefix) {
+				var greekPrefix string
+				floatValue, greekPrefix = formatBits(floatValue)
+				label = fmt.Sprintf("%s%s/s", greekPrefix, namePrefix)
+				break
+			}
 		}
 
 		// prevent showing fractions when unnecessary

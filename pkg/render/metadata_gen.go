@@ -7,16 +7,29 @@ package render
 // This is auto-generated from doc comments on methods in types.go.
 var methodDescriptions = map[string]string{
 	"EventViewModel.AddDetail":                        "AddDetail adds a detail to the event's Details collection.",
+	"EventViewModel.BasePortalURL":                    "BasePortalURL returns the portal base domain for the event.",
 	"EventViewModel.IsAlarm":                          "IsAlarm returns true if event type is alarm.",
+	"EventViewModel.IsCloudApp":                       "IsCloudApp reports whether the event application is Cloud.",
 	"EventViewModel.IsCustomInsight":                  "IsCustomInsight returns true if event type is custom-insight.",
 	"EventViewModel.IsInsight":                        "IsInsight returns true if event type is insight or custom-insight.",
+	"EventViewModel.IsKmetricsApp":                    "IsKmetricsApp reports whether the event application is Kmetrics.",
+	"EventViewModel.IsKtracApp":                       "IsKtracApp reports whether the event application is Ktrac.",
 	"EventViewModel.IsMitigation":                     "IsMitigation returns true if event type is mitigation.",
+	"EventViewModel.IsNMSApp":                         "IsNMSApp reports whether the event application is NMS.",
+	"EventViewModel.IsProtectApp":                     "IsProtectApp reports whether the event application is DDoS.",
 	"EventViewModel.IsSynthetic":                      "IsSynthetic returns true if event type is synthetic.",
-	"EventViewModel.UnmarshalJSON":                    "",
+	"EventViewModel.IsSyntheticsApp":                  "IsSyntheticsApp reports whether the event application is Synthetics.",
+	"EventViewModel.IsTest":                           "IsTest reports whether the event is a test event.",
+	"EventViewModel.IsTrafficApp":                     "IsTrafficApp reports whether the event application is Core.",
+	"EventViewModel.TopLevelApplication":              "TopLevelApplication returns the last application segment.",
+	"EventViewModel.UnmarshalJSON":                    "UnmarshalJSON decodes an EventViewModel with custom fields.",
+	"EventViewModelDetail.GetValues":                  "GetValues returns the detail value(s) as a slice.",
+	"EventViewModelDetail.IsList":                     "IsList reports whether the detail value is a list-like type.",
 	"EventViewModelDetail.LabelOrName":                "LabelOrName returns Label if set, otherwise returns Name.",
-	"EventViewModelDetail.UnmarshalJSON":              "",
+	"EventViewModelDetail.UnmarshalJSON":              "UnmarshalJSON decodes an EventViewModelDetail with tags.",
 	"EventViewModelDetails.General":                   "General returns details with an empty tag.",
 	"EventViewModelDetails.Get":                       "Get retrieves a detail by name.",
+	"EventViewModelDetails.GetStringValue":            "GetStringValue retrieves a string value by name.",
 	"EventViewModelDetails.GetValue":                  "GetValue retrieves a value by name.",
 	"EventViewModelDetails.Has":                       "Has checks if a detail with the given name exists.",
 	"EventViewModelDetails.HasTag":                    "HasTag checks if any detail has the specified tag.",
@@ -24,6 +37,7 @@ var methodDescriptions = map[string]string{
 	"EventViewModelDetails.PrettifiedMetrics":         "PrettifiedMetrics returns metric details with formatted values.",
 	"EventViewModelDetails.ToMap":                     "ToMap converts details to a name-to-value map.",
 	"EventViewModelDetails.Values":                    "Values returns all detail values.",
+	"EventViewModelDetails.ValuesWithTag":             "ValuesWithTag returns all detail values with the specified tag.",
 	"EventViewModelDetails.WithNames":                 "WithNames filters details by the given names.",
 	"EventViewModelDetails.WithTag":                   "WithTag filters details by the specified tag.",
 	"NotificationViewModel.ActiveCount":               "ActiveCount returns the count of currently active events.",
@@ -47,7 +61,7 @@ var methodDescriptions = map[string]string{
 	"NotificationViewModel.NowUnix":                   "NowUnix returns the current time as Unix timestamp.",
 	"NotificationViewModel.Summary":                   "Summary returns the generated summary text.",
 	"NotificationViewModel.SyntheticsDashboardURL":    "SyntheticsDashboardURL returns the synthetics dashboard URL.",
-	"NotificationViewModel.UnmarshalJSON":             "",
+	"NotificationViewModel.UnmarshalJSON":             "UnmarshalJSON decodes a NotificationViewModel with derived fields.",
 }
 
 // functionMetadata contains metadata for all template functions.
@@ -67,19 +81,19 @@ var functionMetadata = []*SchemaFunction{
 	},
 	{
 		Name:        "importanceLabel",
-		Signature:   "(severity ViewModelImportance) string",
+		Signature:   "(severity types.ViewModelImportance) string",
 		Description: "importanceLabel returns the title-case label for an importance level.",
 		Category:    "formatting",
 	},
 	{
 		Name:        "importanceToColor",
-		Signature:   "(severity ViewModelImportance) string",
+		Signature:   "(severity types.ViewModelImportance) string",
 		Description: "importanceToColor returns the hex color code for an importance level.",
 		Category:    "formatting",
 	},
 	{
 		Name:        "importanceToEmoji",
-		Signature:   "(severity ViewModelImportance) string",
+		Signature:   "(severity types.ViewModelImportance) string",
 		Description: "importanceToEmoji returns the emoji(s) for an importance level.",
 		Category:    "formatting",
 	},
@@ -120,6 +134,12 @@ var functionMetadata = []*SchemaFunction{
 		Category:    "conversion",
 	},
 	{
+		Name:        "toLower",
+		Signature:   "(s string) string",
+		Description: "toLower converts a string to lowercase.",
+		Category:    "string",
+	},
+	{
 		Name:        "toUpper",
 		Signature:   "(s string) string",
 		Description: "toUpper converts a string to uppercase.",
@@ -137,14 +157,16 @@ var functionMetadata = []*SchemaFunction{
 // This is auto-generated from type definitions and const blocks in types.go.
 var enumDefinitions = map[string]*SchemaEnum{
 	"DetailTag": {
-		Values:      []string{"", "metric", "dimension", "url", "device", "device_labels", "device_label"},
+		Values:      []string{"", "general", "metric", "dimension", "url", "device", "device_labels", "device_label"},
 		Description: "DetailTag categorizes event details.",
 	},
 	"EventType": {
-		Values: []string{"alarm", "insight", "custom-insight", "synthetic", "mitigation", "generic"},
+		Values:      []string{"alarm", "insight", "custom-insight", "synthetic", "mitigation", "generic"},
+		Description: "EventType represents the notification event category.",
 	},
 	"ViewModelImportance": {
-		Values: []string{"None", "Healthy", "Notice", "Minor", "Warning", "Major", "Severe", "Critical"},
+		Values:      []string{"None", "Healthy", "Notice", "Minor", "Warning", "Major", "Severe", "Critical"},
+		Description: "ViewModelImportance represents severity levels for view model events.",
 	},
 }
 

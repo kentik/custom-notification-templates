@@ -8,52 +8,61 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/kentik/custom-notification-templates/pkg/types"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
-// toUpper converts a string to uppercase.
+// ToUpper converts a string to uppercase.
 // Category: string
-func toUpper(s string) string {
+func ToUpper(s string) string {
 	return strings.ToUpper(s)
 }
 
-// title converts a string to title case.
+// ToLower converts a string to lowercase.
 // Category: string
-func title(s string) string {
+func ToLower(s string) string {
+	return strings.ToLower(s)
+}
+
+// Title converts a string to Title case.
+// Category: string
+func Title(s string) string {
 	return cases.Title(language.English).String(s)
 }
 
-// trimSpace removes leading and trailing whitespace.
+// TrimSpace removes leading and trailing whitespace.
 // Category: string
-func trimSpace(s string) string {
+func TrimSpace(s string) string {
 	return strings.TrimSpace(s)
 }
 
-// split splits a string by the given separator.
+// Split splits a string by the given separator.
 // Category: string
-func split(s string, sep string) []string {
+func Split(s string, sep string) []string {
 	return strings.Split(s, sep)
 }
 
 var TextTemplateFuncMap = template.FuncMap{
-	"toUpper":   toUpper,
-	"title":     title,
-	"trimSpace": trimSpace,
-	"split":     split,
+	"toUpper":   ToUpper,
+	"toLower":   ToLower,
+	"title":     Title,
+	"trimSpace": TrimSpace,
+	"split":     Split,
 
-	"toJSON":          toJSON,
-	"j":               toJSON,
-	"uglifyJSON":      compactJSON,
-	"explodeJSONKeys": explodeJSONKeys,
-	"x":               explodeJSONKeys,
-	"timeRfc3339":     timeRfc3339,
-	"join":            join,
-	"joinWith":        joinWith,
+	"toJSON":          ToJSON,
+	"j":               ToJSON,
+	"uglifyJSON":      CompactJSON,
+	"explodeJSONKeys": ExplodeJSONKeys,
+	"x":               ExplodeJSONKeys,
+	"timeRfc3339":     TimeRfc3339,
+	"join":            Join,
+	"joinWith":        JoinWith,
 
-	"importanceLabel":   importanceLabel,
-	"importanceToColor": importanceToColor,
-	"importanceToEmoji": importanceToEmoji,
+	"importanceName":    ImportanceName,
+	"importanceLabel":   ImportanceLabel,
+	"importanceToColor": ImportanceToColor,
+	"importanceToEmoji": ImportanceToEmoji,
 }
 
 func tryParseTime(input string) (time.Time, error) {
@@ -80,10 +89,10 @@ func tryParseTime(input string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("unable to parse time: %s", input)
 }
 
-// timeRfc3339 converts various time formats to RFC3339.
+// TimeRfc3339 converts various time formats to RFC3339.
 // Accepts string, int (Unix timestamp), or time.Time.
 // Category: time
-func timeRfc3339(input interface{}) string {
+func TimeRfc3339(input interface{}) string {
 	var t time.Time
 	var err error
 
@@ -106,9 +115,9 @@ func timeRfc3339(input interface{}) string {
 	return t.Format(time.RFC3339)
 }
 
-// toJSON converts any value to a JSON string.
+// ToJSON converts any value to a JSON string.
 // Category: conversion
-func toJSON(v interface{}) string {
+func ToJSON(v interface{}) string {
 	bs, err := json.Marshal(v)
 	if err != nil {
 		return "null"
@@ -116,74 +125,76 @@ func toJSON(v interface{}) string {
 	return string(bs)
 }
 
-// join returns a comma for index > 0, empty string for index 0.
+// Join returns a comma for index > 0, empty string for index 0.
 // Useful for joining list items in templates.
 // Category: utility
-func join(index int) string {
+func Join(index int) string {
 	if index == 0 {
 		return ""
 	}
 	return ","
 }
 
-// joinWith returns the separator for index > 0, empty string for index 0.
+// JoinWith returns the separator for index > 0, empty string for index 0.
 // Category: utility
-func joinWith(index int, join string) string {
+func JoinWith(index int, join string) string {
 	if index == 0 {
 		return ""
 	}
 	return join
 }
 
-// compactJSON compacts a JSON string by removing whitespace.
+// CompactJSON compacts a JSON string by removing whitespace.
 // Category: conversion
-func compactJSON(s string) string {
+func CompactJSON(s string) string {
 	var v interface{}
 	err := json.Unmarshal([]byte(s), &v)
 	if err != nil {
 		return "uglifyErr"
 	}
-	return toJSON(v)
+	return ToJSON(v)
 }
 
-// explodeJSONKeys extracts object key-values without braces.
+// ExplodeJSONKeys extracts object key-values without braces.
 // Category: conversion
-func explodeJSONKeys(s string) string {
+func ExplodeJSONKeys(s string) string {
 	// Input: a stringified JSON object.
 	// Output: a not-quite-json string of just the object kvs, fit to be embedded in another object.
-	compacted := compactJSON(s)
+	compacted := CompactJSON(s)
 	if len(compacted) > 1 && compacted[0] == '{' && compacted[len(compacted)-1] == '}' {
 		return compacted[1 : len(compacted)-1]
 	}
 	return "explodeJSONKeysErr"
 }
 
-// importanceToColor returns the hex color code for an importance level.
+// ImportanceToColor returns the hex color code for an importance level.
 // Category: formatting
-func importanceToColor(severity ViewModelImportance) string {
-	if color, ok := ImportanceToColors[severity]; ok {
+func ImportanceToColor(severity types.ViewModelImportance) string {
+	if color, ok := types.ImportanceToColors[severity]; ok {
 		return color
 	}
 	return ""
 }
 
-func importanceName(severity ViewModelImportance) string {
-	if label, ok := ImportanceNames[severity]; ok {
+// ImportanceToColor returns the hex color code for an importance level.
+// Category: formatting
+func ImportanceName(severity types.ViewModelImportance) string {
+	if label, ok := types.ImportanceNames[severity]; ok {
 		return label
 	}
 	return ""
 }
 
-// importanceLabel returns the title-case label for an importance level.
+// ImportanceLabel returns the title-case label for an importance level.
 // Category: formatting
-func importanceLabel(severity ViewModelImportance) string {
-	return cases.Title(language.English).String(importanceName(severity))
+func ImportanceLabel(severity types.ViewModelImportance) string {
+	return cases.Title(language.English).String(ImportanceName(severity))
 }
 
-// importanceToEmoji returns the emoji(s) for an importance level.
+// ImportanceToEmoji returns the emoji(s) for an importance level.
 // Category: formatting
-func importanceToEmoji(severity ViewModelImportance) string {
-	if emoji, ok := ImportanceToEmojis[severity]; ok {
+func ImportanceToEmoji(severity types.ViewModelImportance) string {
+	if emoji, ok := types.ImportanceToEmojis[severity]; ok {
 		return emoji
 	}
 	return ""
