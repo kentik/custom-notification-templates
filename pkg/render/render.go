@@ -8,6 +8,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/kentik/custom-notification-templates/pkg/types"
 )
 
 var lineColumnRegex = regexp.MustCompile(`template:\s*[^:]+:(\d+)(?::(\d+))?`)
@@ -59,8 +61,8 @@ func Render(req RenderRequest) RenderResponse {
 	return RenderResponse{Output: buf.String()}
 }
 
-func buildContext(data json.RawMessage) (*NotificationViewModel, bool, error) {
-	var res NotificationViewModel
+func buildContext(data json.RawMessage) (*types.NotificationViewModel, bool, error) {
+	var res types.NotificationViewModel
 
 	dec := json.NewDecoder(strings.NewReader(string(data)))
 	dec.DisallowUnknownFields()

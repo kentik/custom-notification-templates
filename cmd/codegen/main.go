@@ -19,9 +19,10 @@ import (
 
 func main() {
 	var (
-		pkg    = flag.String("pkg", "", "Target package name")
-		dir    = flag.String("dir", ".", "Directory to scan")
-		output = flag.String("output", "", "Output file name")
+		pkg       = flag.String("pkg", "", "Target package name")
+		dir       = flag.String("dir", ".", "Directory to scan")
+		output    = flag.String("output", "", "Output file name")
+		extraDirs = flag.String("extra-dirs", "", "Comma-separated extra dirs for enums and methods")
 	)
 	flag.Parse()
 
@@ -47,6 +48,13 @@ func main() {
 	methods := extractMethods(targetPkg)
 	functions := extractFunctions(targetPkg)
 	enums := extractEnums(targetPkg)
+	if *extraDirs != "" {
+		extraMethods := extractMethodsFromDirs(*extraDirs)
+		methods = mergeMethods(methods, extraMethods)
+
+		extraEnums := extractEnumsFromDirs(*extraDirs)
+		enums = mergeEnums(enums, extraEnums)
+	}
 
 	// Generate code
 	code := generateCode(*pkg, methods, functions, enums)
@@ -167,12 +175,14 @@ func extractFunctions(pkg *ast.Package) []FunctionInfo {
 			}
 
 			funcName := fn.Name.Name
+			// historically functions were lowercase in templates
+			funcName = strings.ToLower(funcName[:1]) + funcName[1:]
 
 			// Skip test functions, tryParseTime, importanceName
 			if strings.HasPrefix(funcName, "Test") ||
-			   strings.HasPrefix(funcName, "Benchmark") ||
-			   funcName == "tryParseTime" ||
-			   funcName == "importanceName" {
+				strings.HasPrefix(funcName, "Benchmark") ||
+				funcName == "tryParseTime" ||
+				funcName == "importanceName" {
 				continue
 			}
 
@@ -182,6 +192,7 @@ func extractFunctions(pkg *ast.Package) []FunctionInfo {
 			if fn.Doc != nil {
 				fullDoc := fn.Doc.Text()
 				doc = extractFirstSentence(fullDoc)
+				doc = strings.ReplaceAll(doc, fn.Name.Name, funcName)
 				category = extractCategory(fullDoc)
 			}
 
@@ -287,6 +298,91 @@ func extractEnums(pkg *ast.Package) []EnumInfo {
 	})
 
 	return enums
+}
+
+func extractEnumsFromDirs(enumDirs string) []EnumInfo {
+	var enums []EnumInfo
+	for _, dir := range strings.Split(enumDirs, ",") {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			continue
+		}
+		fset := token.NewFileSet()
+		pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
+		if err != nil {
+			log.Fatalf("Parse error for enum dir %s: %v", dir, err)
+		}
+		for _, pkg := range pkgs {
+			enums = append(enums, extractEnums(pkg)...)
+		}
+	}
+	return enums
+}
+
+func extractMethodsFromDirs(methodDirs string) []MethodInfo {
+	var methods []MethodInfo
+	for _, dir := range strings.Split(methodDirs, ",") {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			continue
+		}
+		fset := token.NewFileSet()
+		pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
+		if err != nil {
+			log.Fatalf("Parse error for method dir %s: %v", dir, err)
+		}
+		for _, pkg := range pkgs {
+			methods = append(methods, extractMethods(pkg)...)
+		}
+	}
+	return methods
+}
+
+func mergeMethods(primary []MethodInfo, extra []MethodInfo) []MethodInfo {
+	methodByKey := make(map[string]MethodInfo)
+	for _, method := range primary {
+		key := method.TypeName + "." + method.MethodName
+		methodByKey[key] = method
+	}
+	for _, method := range extra {
+		key := method.TypeName + "." + method.MethodName
+		if _, exists := methodByKey[key]; exists {
+			continue
+		}
+		methodByKey[key] = method
+	}
+	merged := make([]MethodInfo, 0, len(methodByKey))
+	for _, method := range methodByKey {
+		merged = append(merged, method)
+	}
+	sort.Slice(merged, func(i, j int) bool {
+		if merged[i].TypeName == merged[j].TypeName {
+			return merged[i].MethodName < merged[j].MethodName
+		}
+		return merged[i].TypeName < merged[j].TypeName
+	})
+	return merged
+}
+
+func mergeEnums(primary []EnumInfo, extra []EnumInfo) []EnumInfo {
+	enumByName := make(map[string]EnumInfo)
+	for _, enumInfo := range primary {
+		enumByName[enumInfo.Name] = enumInfo
+	}
+	for _, enumInfo := range extra {
+		if _, exists := enumByName[enumInfo.Name]; exists {
+			continue
+		}
+		enumByName[enumInfo.Name] = enumInfo
+	}
+	merged := make([]EnumInfo, 0, len(enumByName))
+	for _, enumInfo := range enumByName {
+		merged = append(merged, enumInfo)
+	}
+	sort.Slice(merged, func(i, j int) bool {
+		return merged[i].Name < merged[j].Name
+	})
+	return merged
 }
 
 // findConstBlockAfter looks for a const block matching the type prefix within the next few declarations
