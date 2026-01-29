@@ -49,10 +49,8 @@ func main() {
 	functions := extractFunctions(targetPkg)
 	enums := extractEnums(targetPkg)
 	if *extraDirs != "" {
-		extraMethods := extractMethodsFromDirs(*extraDirs)
+		extraMethods, extraEnums := extractMethodsAndEnumsFromDirs(*extraDirs)
 		methods = mergeMethods(methods, extraMethods)
-
-		extraEnums := extractEnumsFromDirs(*extraDirs)
 		enums = mergeEnums(enums, extraEnums)
 	}
 
@@ -176,7 +174,9 @@ func extractFunctions(pkg *ast.Package) []FunctionInfo {
 
 			funcName := fn.Name.Name
 			// historically functions were lowercase in templates
-			funcName = strings.ToLower(funcName[:1]) + funcName[1:]
+			if len(funcName) > 1 {
+				funcName = strings.ToLower(funcName[:1]) + funcName[1:]
+			}
 
 			// Skip test functions, tryParseTime, importanceName
 			if strings.HasPrefix(funcName, "Test") ||
@@ -300,28 +300,10 @@ func extractEnums(pkg *ast.Package) []EnumInfo {
 	return enums
 }
 
-func extractEnumsFromDirs(enumDirs string) []EnumInfo {
-	var enums []EnumInfo
-	for _, dir := range strings.Split(enumDirs, ",") {
-		dir = strings.TrimSpace(dir)
-		if dir == "" {
-			continue
-		}
-		fset := token.NewFileSet()
-		pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
-		if err != nil {
-			log.Fatalf("Parse error for enum dir %s: %v", dir, err)
-		}
-		for _, pkg := range pkgs {
-			enums = append(enums, extractEnums(pkg)...)
-		}
-	}
-	return enums
-}
-
-func extractMethodsFromDirs(methodDirs string) []MethodInfo {
+func extractMethodsAndEnumsFromDirs(dirs string) ([]MethodInfo, []EnumInfo) {
 	var methods []MethodInfo
-	for _, dir := range strings.Split(methodDirs, ",") {
+	var enums []EnumInfo
+	for _, dir := range strings.Split(dirs, ",") {
 		dir = strings.TrimSpace(dir)
 		if dir == "" {
 			continue
@@ -329,13 +311,14 @@ func extractMethodsFromDirs(methodDirs string) []MethodInfo {
 		fset := token.NewFileSet()
 		pkgs, err := parser.ParseDir(fset, dir, nil, parser.ParseComments)
 		if err != nil {
-			log.Fatalf("Parse error for method dir %s: %v", dir, err)
+			log.Fatalf("Parse error for dir %s: %v", dir, err)
 		}
 		for _, pkg := range pkgs {
 			methods = append(methods, extractMethods(pkg)...)
+			enums = append(enums, extractEnums(pkg)...)
 		}
 	}
-	return methods
+	return methods, enums
 }
 
 func mergeMethods(primary []MethodInfo, extra []MethodInfo) []MethodInfo {

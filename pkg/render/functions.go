@@ -176,7 +176,7 @@ func ImportanceToColor(severity types.ViewModelImportance) string {
 	return ""
 }
 
-// ImportanceToColor returns the hex color code for an importance level.
+// ImportanceName returns the textual label for an importance level.
 // Category: formatting
 func ImportanceName(severity types.ViewModelImportance) string {
 	if label, ok := types.ImportanceNames[severity]; ok {
