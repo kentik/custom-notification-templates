@@ -14,12 +14,13 @@ type EventType string
 
 // EventType_* and EventApplication_* constants define supported values.
 const (
-	EventType_Alarm         string = "alarm"
-	EventType_Insight       string = "insight"
-	EventType_CustomInsight string = "custom-insight"
-	EventType_Synthetics    string = "synthetic"
-	EventType_Mitigation    string = "mitigation"
-	EventType_Generic       string = "generic"
+	EventType_Alarm           string = "alarm"
+	EventType_Insight         string = "insight"
+	EventType_CustomInsight   string = "custom-insight"
+	EventType_Synthetics      string = "synthetic"
+	EventType_Mitigation      string = "mitigation"
+	EventType_Generic         string = "generic"
+	EventType_AIInvestigation string = "ai-investigation"
 
 	EventApplication_Unspecified = ""
 	EventApplication_NMS         = "nms"
