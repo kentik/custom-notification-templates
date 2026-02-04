@@ -206,6 +206,11 @@ func (event EventViewModel) IsCloudApp() bool {
 	return event.TopLevelApplication() == EventApplication_Cloud
 }
 
+// IsAIInvestigation returns true if event type is ai-investigation.
+func (event EventViewModel) IsAIInvestigation() bool {
+	return event.Type == EventType_AIInvestigation
+}
+
 // BasePortalURL returns the portal base domain for the event.
 func (event EventViewModel) BasePortalURL() string {
 	return event.BaseDomain
